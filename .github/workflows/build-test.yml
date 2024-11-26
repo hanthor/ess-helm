@@ -92,6 +92,9 @@ jobs:
         poetry install
         echo "$(poetry env info -p)/bin" >> "${GITHUB_PATH}"
 
+    - name: Update helm dependencies recursively
+      run: scripts/helm_dependency_update_recursive.sh
+
     - name: Run kubeconform
       run: |
         for subchart in charts/*; do
