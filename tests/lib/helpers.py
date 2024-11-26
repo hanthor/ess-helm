@@ -2,12 +2,16 @@
 #
 # SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-Element-Commercial
 
+import os
 from collections.abc import Awaitable
 
+import pyhelm3
+import yaml
 from lightkube.models.meta_v1 import ObjectMeta
 from lightkube.resources.core_v1 import Namespace, Secret
 
 from ..artifacts import CertKey, generate_cert
+from ..fixtures.data import ESSData
 
 
 def namespace(name: str) -> Awaitable[Namespace]:
@@ -34,3 +38,20 @@ def kubernetes_tls_secret(name: str, namespace: str, ca: CertKey, dns_names: [st
         },
     )
     return secret
+
+
+async def install_matrix_stack(helm_client: pyhelm3.Client, generated_data: ESSData):
+    with open(os.environ["TEST_VALUES_FILE"]) as stream:
+        values = yaml.safe_load(stream)
+
+    chart = await helm_client.get_chart("charts/matrix-stack")
+    # Install or upgrade a release
+    revision = helm_client.install_or_upgrade_release(
+        generated_data.release_name,
+        chart,
+        values,
+        namespace=generated_data.ess_namespace,
+        atomic=True,
+        wait=True,
+    )
+    return revision

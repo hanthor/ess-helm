@@ -3,3 +3,4 @@
 # SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-Element-Commercial
 
 export TEST_SYNAPSE=1
+export TEST_VALUES_FILE=charts/matrix-stack/ci/pytest-synapse-values.yaml

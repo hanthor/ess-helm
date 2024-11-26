@@ -6,10 +6,9 @@ import asyncio
 import os
 
 import pytest
-import yaml
 
 from ..fixtures import ESSData
-from ..lib.helpers import kubernetes_tls_secret
+from ..lib.helpers import install_matrix_stack, kubernetes_tls_secret
 from ..lib.utils import aiottp_get_json
 
 
@@ -28,26 +27,17 @@ async def test_element_web(
             "element-web-tls", generated_data.ess_namespace, ca, ["element.ess.localhost"], bundled=True
         )
     ]
-
-    with open("charts/element-web/ci/pytest-values.yaml") as stream:
-        values = yaml.safe_load(stream)
-
-    chart = await helm_client.get_chart("charts/element-web")
-    # Install or upgrade a release
-    revision = helm_client.install_or_upgrade_release(
-        f"eleweb-{generated_data.secrets_random}",
-        chart,
-        values,
-        namespace=generated_data.ess_namespace,
-        atomic=True,
-        wait=True,
-    )
+    revision = await install_matrix_stack(helm_client, generated_data)
 
     await asyncio.gather(revision, *[kube_client.create(r) for r in resources])
 
+
+@pytest.mark.skipif(os.environ.get("TEST_ELEMENT_WEB") != "1", reason="ElementWeb not deployed")
+@pytest.mark.asyncio_cooperative
+async def test_can_access_config_json(cluster, revision_deployed, generated_data: ESSData, ssl_context):
     await asyncio.to_thread(
         cluster.wait,
-        name=f"ingress/eleweb-{generated_data.secrets_random}-element-web",
+        name=f"ingress/{generated_data.release_name}-element-web",
         namespace=generated_data.ess_namespace,
         waitfor="jsonpath='{.status.loadBalancer.ingress[0].ip}'",
     )

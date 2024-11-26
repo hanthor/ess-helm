@@ -40,6 +40,10 @@ class ESSData:
     another_ca: CertKey
 
     @property
+    def release_name(self):
+        return f"pytest-{self.secrets_random}"
+
+    @property
     def ess_namespace(self):
         return f"ess-{self.secrets_random}"
 

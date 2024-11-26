@@ -8,10 +8,9 @@ import os
 from pathlib import Path
 
 import pytest
-import yaml
 
 from ..fixtures import ESSData
-from ..lib.helpers import kubernetes_tls_secret
+from ..lib.helpers import install_matrix_stack, kubernetes_tls_secret
 from ..lib.synapse import assert_downloaded_content, download_media, upload_media
 from ..lib.utils import KubeCtl, aiohttp_post_json, aiottp_get_json
 from ..services import PostgresServer
@@ -42,25 +41,13 @@ async def test_synapse(
         password=generated_data.synapse_postgres_password,
     ).setup(helm_client, kube_client)
 
-    with open("charts/synapse/ci/pytest-values.yaml") as stream:
-        values = yaml.safe_load(stream)
-
-    chart = await helm_client.get_chart("charts/synapse")
-    # Install or upgrade a release
-    revision = helm_client.install_or_upgrade_release(
-        f"synapse-{generated_data.secrets_random}",
-        chart,
-        values,
-        namespace=generated_data.ess_namespace,
-        atomic=True,
-        wait=True,
-    )
+    revision = await install_matrix_stack(helm_client, generated_data)
 
     await asyncio.gather(revision, postgres_setup, *[kube_client.create(r) for r in resources])
 
     await asyncio.to_thread(
         cluster.wait,
-        name=f"ingress/synapse-{generated_data.secrets_random}-synapse",
+        name=f"ingress/{generated_data.release_name}-synapse",
         namespace=generated_data.ess_namespace,
         waitfor="jsonpath='{.status.loadBalancer.ingress[0].ip}'",
     )
