@@ -3,13 +3,15 @@ Copyright 2024 New Vector Ltd
 
 SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-Element-Commercial
 #}
+# This file is generated. Do not edit directly. Edit source/values.yaml.j2 instead to make changes
 
 {% import 'sub_schema_values.yaml.j2' as sub_schema_values -%}
-{{ sub_schema_values.generatedFileWarning() }}
 {{ sub_schema_values.global() }}
 
-element-web:
-  enabled: true
+elementWeb:
+  {% macro elementWebValues() %}{% include 'element-web/values.yaml.j2'%}{% endmacro %}
+  {{ elementWebValues() | trim | indent(2) }}
 
 synapse:
-  enabled: true
+  {% macro synapseValues() %}{% include 'synapse/values.yaml.j2'%}{% endmacro %}
+  {{ synapseValues() | trim | indent(2) }}

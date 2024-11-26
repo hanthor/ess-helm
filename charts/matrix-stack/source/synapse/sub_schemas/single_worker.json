@@ -1,0 +1,11 @@
+{
+  "properties": {
+    "enabled": {
+      "type": "boolean"
+    },
+    "resources": {
+      "$ref": "file://./sub_schemas/resources.json"
+    }
+  },
+  "type": "object"
+}

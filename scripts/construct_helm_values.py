@@ -10,11 +10,21 @@ import typer
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
 
+def find_sub_schemas(root_dir):
+    sub_schemas_dirs = []
+
+    for path in Path(root_dir).rglob('sub_schemas'):
+        if path.is_dir():
+            sub_schemas_dirs.append(path)
+    return sub_schemas_dirs
+
+
 def construct_values_file(source_values_template_path: Path, destination_values_path: Path):
-    shared_sub_schemas_path = Path(__file__).parent.parent / "charts" / "matrix-stack" / "sub_schemas"
-    chart_sub_schemas_path = source_values_template_path.parent / "sub_schemas"
+    chart_path = Path(__file__).parent.parent / "charts" / "matrix-stack"
+    shared_sub_schemas_path = chart_path / "sub_schemas"
     env = Environment(
-        loader=FileSystemLoader([source_values_template_path.parent, shared_sub_schemas_path, chart_sub_schemas_path]),
+        loader=FileSystemLoader([source_values_template_path.parent, shared_sub_schemas_path,
+                                 *find_sub_schemas(chart_path)]),
         autoescape=select_autoescape,
         keep_trailing_newline=True,
     )

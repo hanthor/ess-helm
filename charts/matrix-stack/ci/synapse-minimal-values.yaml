@@ -2,17 +2,8 @@
 #
 # SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-Element-Commercial
 
-## Values file containing minimal values for components that are enabled by default only
-
 ess:
   server_name: ess.localhost
-
-element-web:
-  defaultMatrixServer:
-    baseUrl: https://synapse.ess.localhost
-
-  ingress:
-    host: element.ess.localhost
 
 synapse:
   ingress:

@@ -1,0 +1,22 @@
+# Copyright 2024 New Vector Ltd
+#
+# SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-Element-Commercial
+
+{{- if not .Values.synapse.media.storage.existingClaim }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    {{- include "element-io.synapse.labels" $ | nindent 4 }}
+  name: {{ .Release.Name }}-synapse-media
+  namespace: {{ .Release.Namespace }}
+spec:
+{{- with .Values.synapse.media.storage.storageClassName }}
+  storageClassName: {{ . }}
+{{- end }}
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.synapse.media.storage.size }}
+{{- end }}

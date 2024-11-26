@@ -95,7 +95,7 @@ async def test_synapse_media_upload_fetch_authenticated(
     )
 
     content_download_sha256 = await download_media(
-        server_name="ess.localhost",
+        serverName="ess.localhost",
         user_access_token=user_access_token,
         synapse_fqdn="synapse.ess.localhost",
         content_upload_json=content_upload_json,

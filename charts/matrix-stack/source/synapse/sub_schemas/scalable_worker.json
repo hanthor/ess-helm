@@ -1,0 +1,18 @@
+{
+  "required": [
+    "instances"
+  ],
+  "properties": {
+    "enabled": {
+      "type": "boolean"
+    },
+    "instances": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "resources": {
+      "$ref": "file://./sub_schemas/resources.json"
+    }
+  },
+  "type": "object"
+}

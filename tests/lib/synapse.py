@@ -102,19 +102,19 @@ async def upload_media(synapse_fqdn: str, user_access_token: str, file_path: Pat
 
 
 async def download_media(
-    server_name: str, synapse_fqdn: str, user_access_token, content_upload_json: dict, ssl_context: SSLContext
+    serverName: str, synapse_fqdn: str, user_access_token, content_upload_json: dict, ssl_context: SSLContext
 ):
     headers = {}
     headers["Authorization"] = f"Bearer {user_access_token}"
     headers["Host"] = synapse_fqdn
-    content_id = content_upload_json["content_uri"].replace(f"mxc://{server_name}/", "")
+    content_id = content_upload_json["content_uri"].replace(f"mxc://{serverName}/", "")
 
     # Initialize SHA-256 hasher
     sha256_hash = hashlib.sha256()
     async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(ssl=ssl_context)) as session, RetryClient(
         session, retry_options=retry_options, raise_for_status=True
     ) as retry, retry.get(
-        f"https://127.0.0.1/_matrix/client/v1/media/download/{server_name}/{content_id}",
+        f"https://127.0.0.1/_matrix/client/v1/media/download/{serverName}/{content_id}",
         headers=headers,
         server_hostname=synapse_fqdn,
     ) as response:

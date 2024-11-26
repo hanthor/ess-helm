@@ -1,0 +1,69 @@
+{
+  "$id": "file://element-web",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": [
+    "defaultMatrixServer",
+    "ingress"
+  ],
+  "properties": {
+    "enabled": {
+      "type": "boolean"
+    },
+    "additional": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "defaultMatrixServer": {
+      "required": [
+        "baseUrl"
+      ],
+      "properties": {
+        "baseUrl": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "replicas": {
+      "minimum": 1,
+      "type": "integer"
+    },
+    "global": {
+      "$ref": "file://./sub_schemas/ess.json"
+    },
+    "ess-library": {
+      "$ref": "file://./sub_schemas/essLibrary.json"
+    },
+    "image": {
+      "$ref": "file://./sub_schemas/image.json"
+    },
+    "ingress": {
+      "$ref": "file://./sub_schemas/ingress.json"
+    },
+    "labels": {
+      "$ref": "file://./sub_schemas/labels.json"
+    },
+    "annotations": {
+      "$ref": "file://./sub_schemas/workloadAnnotations.json"
+    },
+    "containersSecurityContext": {
+      "$ref": "file://./sub_schemas/containersSecurityContext.json"
+    },
+    "nodeSelector": {
+      "$ref": "file://./sub_schemas/nodeSelector.json"
+    },
+    "podSecurityContext": {
+      "$ref": "file://./sub_schemas/podSecurityContext.json"
+    },
+    "resources": {
+      "$ref": "file://./sub_schemas/resources.json"
+    },
+    "serviceAccount": {
+      "$ref": "file://./sub_schemas/serviceAccount.json"
+    },
+    "tolerations": {
+      "$ref": "file://./sub_schemas/tolerations.json"
+    }
+  }
+}

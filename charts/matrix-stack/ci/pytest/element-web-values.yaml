@@ -1,0 +1,39 @@
+# Copyright 2024 New Vector Ltd
+#
+# SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-Element-Commercial
+
+ess:
+  server_name: ess.localhost
+
+element-web:
+  enabled: true
+  defaultMatrixServer:
+    baseUrl: https://synapse.ess.localhost
+
+  ingress:
+    host: element.ess.localhost
+    tlsSecret: element-web-tls
+
+  replicas: 1
+
+  tolerations:
+    - key: context
+      operator: Equal
+      value: pytest
+      effect: NoSchedule
+
+  additional:
+    {
+      "element_call":
+        {"url": "https://call.ess.localhost", "use_exclusively": true},
+      "features":
+        {
+          "feature_video_rooms": true,
+          "feature_group_calls": true,
+          "feature_new_room_decoration_ui": true,
+          "feature_element_call_video_rooms": true,
+        },
+    }
+
+synapse:
+  enabled: false

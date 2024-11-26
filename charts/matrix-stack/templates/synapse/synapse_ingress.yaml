@@ -1,0 +1,72 @@
+# Copyright 2024 New Vector Ltd
+#
+# SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-Element-Commercial
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+{{- with .Values.synapse.ingress.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+{{- end }}
+  labels:
+    {{- include "element-io.synapse.haproxy.labels" $ | nindent 4 }}
+  name: {{ .Release.Name }}-synapse
+  namespace: {{ .Release.Namespace }}
+spec:
+{{- if .Values.synapse.ingress.tlsSecret }}
+  tls:
+  - hosts:
+    - {{ .Values.synapse.ingress.host | quote }}
+    secretName: {{ .Values.synapse.ingress.tlsSecret | quote }}
+{{- end }}
+{{- with .Values.synapse.ingress.className }}
+  ingressClassName: {{ . | quote }}
+{{- end }}
+  rules:
+  - host: {{ .Values.synapse.ingress.host | quote }}
+    http:
+      paths:
+{{- range .Values.synapse.ingress.additionalPaths -}}
+{{- if eq .availability "only_externally" }}
+      - path: {{ .path }}
+        pathType: Prefix
+        backend:
+          service:
+            name: "{{ .service.name }}"
+            port:
+              {{ .service.port | toYaml }}
+{{- else if eq .availability "blocked" }}
+      - path: {{ .path }}
+        pathType: Prefix
+        backend:
+          service:
+            name: "{{ $.Release.Name }}-synapse-haproxy"
+            port:
+              name: haproxy-403
+{{- end }}
+{{- end }}
+{{- range $synapsePath := (list "/_matrix" "/_synapse") -}}
+{{- /* Determine if this path is equal to, or a subset of, one of the
+   defined additional paths. If so, let the other service handle it and don't
+   add it here. */}}
+{{- $_pathAlreadyDefined := false }}
+{{- range $.Values.synapse.ingress.additionalPaths -}}
+{{- if has .availability (list "only_externally" "blocked") }}
+{{- if hasPrefix .path $synapsePath }}
+{{- $_pathAlreadyDefined = true }}
+{{- end }}
+{{- end }}
+{{- end -}}
+{{- /* The path, or a superset of, has not already been defined in _additional_paths.
+   Define it here.*/}}
+{{- if not $_pathAlreadyDefined }}
+      - path: {{ $synapsePath }}
+        pathType: Prefix
+        backend:
+          service:
+            name: "{{ $.Release.Name }}-synapse-haproxy"
+            port:
+              name: haproxy-http
+{{- end }}
+{{- end }}

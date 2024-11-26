@@ -3,26 +3,14 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "type": "object",
   "properties": {
-    "global": {
-      "$ref": "file://./../../matrix-stack/sub_schemas/global.json"
+    "ess": {
+      "$ref": "file://./sub_schemas/ess.json"
     },
     "element-web": {
-      "type": "object",
-      "additionalProperties": true,
-      "properties": {
-        "enabled": {
-          "type": "boolean"
-        }
-      }
+      "$ref": "file://./element-web/values.schema.json"
     },
     "synapse": {
-      "type": "object",
-      "additionalProperties": true,
-      "properties": {
-        "enabled": {
-          "type": "boolean"
-        }
-      }
+      "$ref": "file://./synapse/values.schema.json"
     }
   }
 }

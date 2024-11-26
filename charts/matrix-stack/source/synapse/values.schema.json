@@ -1,0 +1,274 @@
+{
+  "$id": "file://synapse",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "enabled": {
+      "type": "boolean"
+    },
+    "postgres": {
+      "$ref": "file://./sub_schemas/postgres-libpq.json"
+    },
+    "media": {
+      "type": "object",
+      "properties": {
+        "storage": {
+          "$ref": "file://./sub_schemas/persistentVolumeClaim.json"
+        }
+      }
+    },
+    "macaroon": {
+      "$ref": "file://./sub_schemas/credential.json"
+    },
+    "registrationSharedSecret": {
+      "$ref": "file://./sub_schemas/credential.json"
+    },
+    "signingKey": {
+      "$ref": "file://./sub_schemas/credential.json"
+    },
+    "additional": {
+      "type": "object",
+      "anyOf": [
+        {
+          "required": []
+        },
+        {
+          "required": [
+            "config"
+          ]
+        },
+        {
+          "required": [
+            "configSecret",
+            "configSecretKey"
+          ]
+        }
+      ],
+      "properties": {
+        "config": {
+          "type": "string"
+        },
+        "configSecret": {
+          "type": "string"
+        },
+        "configSecretKey": {
+          "type": "string"
+        }
+      }
+    },
+    "appservices": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "registrationFileConfigMap": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "logging": {
+      "type": "object",
+      "properties": {
+        "rootLevel": {
+          "type": "string",
+          "enum": [
+            "CRITICAL",
+            "ERROR",
+            "WARNING",
+            "INFO",
+            "DEBUG"
+          ]
+        },
+        "levelOverrides": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string",
+            "enum": [
+              "CRITICAL",
+              "ERROR",
+              "WARNING",
+              "INFO",
+              "DEBUG"
+            ]
+          }
+        }
+      }
+    },
+    "global": {
+      "$ref": "file://./sub_schemas/ess.json"
+    },
+    "ess-library": {
+      "$ref": "file://./sub_schemas/essLibrary.json"
+    },
+    "ingress": {
+      "$ref": "file://./synapse/sub_schemas/ingress_with_additional_paths.json"
+    },
+    "image": {
+      "$ref": "file://./sub_schemas/image.json"
+    },
+    "labels": {
+      "$ref": "file://./sub_schemas/labels.json"
+    },
+    "annotations": {
+      "$ref": "file://./sub_schemas/workloadAnnotations.json"
+    },
+    "containersSecurityContext": {
+      "$ref": "file://./sub_schemas/containersSecurityContext.json"
+    },
+    "extraEnv": {
+      "$ref": "file://./sub_schemas/extraEnv.json"
+    },
+    "hostAliases": {
+      "$ref": "file://./sub_schemas/hostAliases.json"
+    },
+    "nodeSelector": {
+      "$ref": "file://./sub_schemas/nodeSelector.json"
+    },
+    "podSecurityContext": {
+      "$ref": "file://./sub_schemas/podSecurityContext.json"
+    },
+    "resources": {
+      "$ref": "file://./sub_schemas/resources.json"
+    },
+    "serviceAccount": {
+      "$ref": "file://./sub_schemas/serviceAccount.json"
+    },
+    "serviceMonitors": {
+      "$ref": "file://./sub_schemas/serviceMonitors.json"
+    },
+    "tolerations": {
+      "$ref": "file://./sub_schemas/tolerations.json"
+    },
+    "workers": {
+      "type": "object",
+      "properties": {
+        "appservice": {
+          "$ref": "file://./synapse/sub_schemas/single_worker.json"
+        },
+        "background": {
+          "$ref": "file://./synapse/sub_schemas/single_worker.json"
+        },
+        "client-reader": {
+          "$ref": "file://./synapse/sub_schemas/scalable_worker.json"
+        },
+        "encryption": {
+          "$ref": "file://./synapse/sub_schemas/single_worker.json"
+        },
+        "event-creator": {
+          "$ref": "file://./synapse/sub_schemas/scalable_worker.json"
+        },
+        "event-persister": {
+          "$ref": "file://./synapse/sub_schemas/scalable_worker.json"
+        },
+        "federation-reader": {
+          "$ref": "file://./synapse/sub_schemas/scalable_worker.json"
+        },
+        "federation-sender": {
+          "$ref": "file://./synapse/sub_schemas/scalable_worker.json"
+        },
+        "initial-synchrotron": {
+          "$ref": "file://./synapse/sub_schemas/scalable_worker.json"
+        },
+        "media-repository": {
+          "$ref": "file://./synapse/sub_schemas/single_worker.json"
+        },
+        "presence-writer": {
+          "$ref": "file://./synapse/sub_schemas/single_worker.json"
+        },
+        "pusher": {
+          "$ref": "file://./synapse/sub_schemas/scalable_worker.json"
+        },
+        "receipts-account": {
+          "$ref": "file://./synapse/sub_schemas/single_worker.json"
+        },
+        "sliding-sync": {
+          "$ref": "file://./synapse/sub_schemas/scalable_worker.json"
+        },
+        "sso-login": {
+          "$ref": "file://./synapse/sub_schemas/single_worker.json"
+        },
+        "synchrotron": {
+          "$ref": "file://./synapse/sub_schemas/scalable_worker.json"
+        },
+        "typing-persister": {
+          "$ref": "file://./synapse/sub_schemas/single_worker.json"
+        },
+        "user-dir": {
+          "$ref": "file://./synapse/sub_schemas/single_worker.json"
+        }
+      }
+    },
+    "haproxy": {
+      "type": "object",
+      "properties": {
+        "replicas": {
+          "minimum": 1,
+          "type": "integer"
+        },
+        "image": {
+          "$ref": "file://./sub_schemas/image.json"
+        },
+        "labels": {
+          "$ref": "file://./sub_schemas/labels.json"
+        },
+        "annotations": {
+          "$ref": "file://./sub_schemas/workloadAnnotations.json"
+        },
+        "containersSecurityContext": {
+          "$ref": "file://./sub_schemas/containersSecurityContext.json"
+        },
+        "nodeSelector": {
+          "$ref": "file://./sub_schemas/nodeSelector.json"
+        },
+        "podSecurityContext": {
+          "$ref": "file://./sub_schemas/podSecurityContext.json"
+        },
+        "resources": {
+          "$ref": "file://./sub_schemas/resources.json"
+        },
+        "serviceAccount": {
+          "$ref": "file://./sub_schemas/serviceAccount.json"
+        },
+        "serviceMonitors": {
+          "$ref": "file://./sub_schemas/serviceMonitors.json"
+        },
+        "tolerations": {
+          "$ref": "file://./sub_schemas/tolerations.json"
+        }
+      }
+    },
+    "redis": {
+      "type": "object",
+      "properties": {
+        "image": {
+          "$ref": "file://./sub_schemas/image.json"
+        },
+        "labels": {
+          "$ref": "file://./sub_schemas/labels.json"
+        },
+        "annotations": {
+          "$ref": "file://./sub_schemas/workloadAnnotations.json"
+        },
+        "containersSecurityContext": {
+          "$ref": "file://./sub_schemas/containersSecurityContext.json"
+        },
+        "nodeSelector": {
+          "$ref": "file://./sub_schemas/nodeSelector.json"
+        },
+        "podSecurityContext": {
+          "$ref": "file://./sub_schemas/podSecurityContext.json"
+        },
+        "resources": {
+          "$ref": "file://./sub_schemas/resources.json"
+        },
+        "serviceAccount": {
+          "$ref": "file://./sub_schemas/serviceAccount.json"
+        },
+        "tolerations": {
+          "$ref": "file://./sub_schemas/tolerations.json"
+        }
+      }
+    }
+  }
+}
