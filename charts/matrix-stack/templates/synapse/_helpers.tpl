@@ -7,7 +7,7 @@
 app.kubernetes.io/component: matrix-server
 app.kubernetes.io/name: synapse
 app.kubernetes.io/instance: {{ .Release.Name }}-synapse
-app.kubernetes.io/version: {{ .Values.synapse.image.tag | default $.Chart.AppVersion }}
+app.kubernetes.io/version: {{ .Values.synapse.image.tag | default .Chart.AppVersion }}
 k8s.element.io/synapse-instance: {{ .Release.Name }}-synapse
 {{- end }}
 
@@ -16,7 +16,7 @@ k8s.element.io/synapse-instance: {{ .Release.Name }}-synapse
 app.kubernetes.io/component: matrix-server
 app.kubernetes.io/name: synapse-{{ .ProcessType }}
 app.kubernetes.io/instance: {{ .Release.Name }}-synapse-{{ .ProcessType }}
-app.kubernetes.io/version: {{ .Values.synapse.image.tag | default $.Chart.AppVersion }}
+app.kubernetes.io/version: {{ .Values.synapse.image.tag | default .Chart.AppVersion }}
 k8s.element.io/synapse-instance: {{ .Release.Name }}-synapse
 {{- end }}
 

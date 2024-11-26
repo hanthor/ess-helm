@@ -1,7 +1,7 @@
 {
   "type": "object",
   "properties": {
-    "server_name": {
+    "serverName": {
       "type": "string"
     },
     "labels": {

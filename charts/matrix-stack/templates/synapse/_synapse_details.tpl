@@ -75,7 +75,7 @@ responsibleForMedia
 
 {{- define "element-io.synapse.streamWriterWorkers" -}}
 {{ $streamWriterWorkers := list }}
-{{- range $workerType := keys ((include "element-io.synapse.enabledWorkers" $) | fromJson) }}
+{{- range $workerType := keys ((include "element-io.synapse.enabledWorkers" .) | fromJson) }}
 {{- if include "element-io.synapse.process.streamWriters" $workerType | fromJsonArray -}}
 {{ $streamWriterWorkers = append $streamWriterWorkers $workerType }}
 {{- end }}

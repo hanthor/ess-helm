@@ -1,8 +1,5 @@
 {
   "type": "object",
-  "required": [
-    "host"
-  ],
   "properties": {
     "annotations": {
       "type": "object",

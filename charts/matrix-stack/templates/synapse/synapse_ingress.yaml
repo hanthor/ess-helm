@@ -2,32 +2,34 @@
 #
 # SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-Element-Commercial
 
+{{- with $.Values.synapse }}
+{{- if .enabled }}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-{{- with .Values.synapse.ingress.annotations }}
+{{- with .ingress.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
 {{- end }}
   labels:
     {{- include "element-io.synapse.haproxy.labels" $ | nindent 4 }}
-  name: {{ .Release.Name }}-synapse
-  namespace: {{ .Release.Namespace }}
+  name: {{ $.Release.Name }}-synapse
+  namespace: {{ $.Release.Namespace }}
 spec:
-{{- if .Values.synapse.ingress.tlsSecret }}
+{{- if .ingress.tlsSecret }}
   tls:
   - hosts:
-    - {{ .Values.synapse.ingress.host | quote }}
-    secretName: {{ .Values.synapse.ingress.tlsSecret | quote }}
+    - {{ .ingress.host | quote }}
+    secretName: {{ .ingress.tlsSecret | quote }}
 {{- end }}
-{{- with .Values.synapse.ingress.className }}
+{{- with .ingress.className }}
   ingressClassName: {{ . | quote }}
 {{- end }}
   rules:
-  - host: {{ .Values.synapse.ingress.host | quote }}
+  - host: {{ .ingress.host | quote }}
     http:
       paths:
-{{- range .Values.synapse.ingress.additionalPaths -}}
+{{- range .ingress.additionalPaths -}}
 {{- if eq .availability "only_externally" }}
       - path: {{ .path }}
         pathType: Prefix
@@ -70,3 +72,5 @@ spec:
               name: haproxy-http
 {{- end }}
 {{- end }}
+{{- end -}}
+{{- end -}}

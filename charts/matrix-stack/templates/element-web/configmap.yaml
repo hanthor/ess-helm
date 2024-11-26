@@ -2,13 +2,17 @@
 #
 # SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-Element-Commercial
 
+{{- with $.Values.elementWeb }}
+{{- if .enabled }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
   labels:
     {{- include "element-io.element-web.labels" . | nindent 4 }}
-  name: {{ .Release.Name }}-element-web
-  namespace: {{ .Release.Namespace }}
+  name: {{ $.Release.Name }}-element-web
+  namespace: {{ $.Release.Namespace }}
 data:
   config.json: |-
     {{- include "element-io.element-web.config" . | nindent 4 }}
+{{- end -}}
+{{- end -}}

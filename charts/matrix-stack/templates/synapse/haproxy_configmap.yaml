@@ -2,16 +2,18 @@
 #
 # SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-Element-Commercial
 
+{{- with $.Values.synapse }}
+{{- if .enabled }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
   labels:
     {{- include "element-io.synapse.haproxy.labels" $ | nindent 4 }}
-  name: {{ .Release.Name }}-synapse-haproxy
-  namespace: {{ .Release.Namespace }}
+  name: {{ $.Release.Name }}-synapse-haproxy
+  namespace: {{ $.Release.Namespace }}
 data:
   haproxy.cfg: |
-    {{- tpl ($.Files.Get "configs/synapse/haproxy.cfg.tpl") . | nindent 4 }}
+    {{- tpl ($.Files.Get "configs/synapse/haproxy.cfg.tpl") (dict "Release" $.Release "Values" $.Values) | nindent 4 }}
   path_map_file: |
     # A map file that is used in haproxy config to map from matrix paths to the
     # named backend. The format is: path_regexp backend_name
@@ -29,7 +31,7 @@ data:
   path_map_file_get: |
     # A map file that is used in haproxy config to map from matrix paths to the
     # named backend. The format is: path_regexp backend_name
-    {{ if dig "client-reader" "enabled" false .Values.synapse.workers }}
+    {{ if dig "client-reader" "enabled" false .workers }}
     ^/_matrix/client/(api/v1|r0|v3|unstable)/pushrules/ client-reader
     {{- end }}
   429.http: |
@@ -44,3 +46,5 @@ data:
     <html><body><h1>429 Too Many Requests</h1>
     No server is available to handle this request.
     </body></html>
+{{- end -}}
+{{- end -}}

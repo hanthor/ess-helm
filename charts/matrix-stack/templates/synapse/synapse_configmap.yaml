@@ -2,25 +2,27 @@
 #
 # SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-Element-Commercial
 
+{{- with $.Values.synapse }}
+{{- if .enabled }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
   labels:
     {{- include "element-io.synapse.labels" $ | nindent 4 }}
-  name: {{ .Release.Name }}-synapse
-  namespace: {{ .Release.Namespace }}
+  name: {{ $.Release.Name }}-synapse
+  namespace: {{ $.Release.Namespace }}
 data:
   01-homeserver-underrides.yaml: |
-    {{- include "element-io.synapse.config.shared-underrides" . | nindent 4  }}
+    {{- include "element-io.synapse.config.shared-underrides" $ | nindent 4  }}
 {{- /*02 files are user provided in Helm values and end up in the Secret*/}}
 {{- /*03 files are user provided as secrets rather than directly in Helm*/}}
   04-homeserver-overrides.yaml: |
-    {{- include "element-io.synapse.config.shared-overrides" . | nindent 4 }}
+    {{- include "element-io.synapse.config.shared-overrides" $ | nindent 4 }}
   05-main.yaml: |
-    {{- include "element-io.synapse.config.processSpecific" (dict "processType" "main" "Values" .Values.synapse) | nindent 4 }}
+    {{- include "element-io.synapse.config.processSpecific" (dict "processType" "main" "context" $) | nindent 4 }}
 {{- range $workerType, $workerDetails := (include "element-io.synapse.enabledWorkers" $) | fromJson }}
   05-{{ $workerType }}.yaml: |
-    {{- include "element-io.synapse.config.processSpecific" (dict "processType" $workerType "Values" $.Values.synapse) | nindent 4 }}
+    {{- include "element-io.synapse.config.processSpecific" (dict "processType" $workerType "context" $) | nindent 4 }}
 {{- end }}
   log_config.yaml: |
     # Copyright 2024 New Vector Ltd
@@ -43,16 +45,18 @@ data:
     nuked if an override is set and then if the root level is increased to debug, the access tokens will be logged.
     Putting here means it is an explicit customer choice to override it.
     */}}
-    {{- range $logger, $level := merge dict .Values.synapse.logging.levelOverrides (dict "synapse.storage.SQL" "INFO") }}
+    {{- range $logger, $level := merge dict .logging.levelOverrides (dict "synapse.storage.SQL" "INFO") }}
       {{ $logger }}:
         level: "{{ $level }}"
     {{- end }}
 
     root:
-      level: "{{ .Values.synapse.logging.rootLevel }}"
+      level: "{{ .logging.rootLevel }}"
       handlers:
       - console
 
     disable_existing_loggers: false
   render_config_with_secrets.py: |
     {{- ($.Files.Get "configs/synapse/render_config_with_secrets.py") | nindent 4 }}
+{{- end -}}
+{{- end -}}

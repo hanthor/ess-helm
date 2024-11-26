@@ -1,7 +1,8 @@
 # Copyright 2024 New Vector Ltd
 #
 # SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-Element-Commercial
-
+{{- with $Release := .Release -}}
+{{- with $Values := .Values -}}
 global
   maxconn 40000
   log stdout format raw local0 info
@@ -150,7 +151,7 @@ frontend http-in
 
   use_backend return_204 if { method OPTIONS }
 
-{{- range .Values.ingress.additionalPaths -}}
+{{- range $Values.synapse.ingress.additionalPaths -}}
 {{- if eq .availability "internally_and_externally" }}
 
 {{- $additionalPathId := printf "%s_%s" .service.name (.service.port.name | default .service.port.number) }}
@@ -158,7 +159,7 @@ frontend http-in
   use_backend be_{{ $additionalPathId }} if is_svc_{{ $additionalPathId }}
 {{- end }}
 {{- end }}
-{{- if dig "initial-synchrotron" "enabled" false .Values.workers }}
+{{- if dig "initial-synchrotron" "enabled" false $Values.synapse.workers }}
 
   # special synchrotron backend for initialsyncs
   acl is_sync path -m reg ^/_matrix/client/(r0|v3)/sync$
@@ -172,9 +173,9 @@ frontend http-in
 backend main
   default-server maxconn 250
   # Use DNS SRV service discovery on the headless service
-  server-template main 1 _synapse-http._tcp.{{ .Release.Name }}-synapse-main.{{ .Release.Namespace }}.svc.cluster.local resolvers kubedns init-addr none
+  server-template main 1 _synapse-http._tcp.{{ $Release.Name }}-synapse-main.{{ $Release.Namespace }}.svc.cluster.local resolvers kubedns init-addr none
 
-{{- range $workerType, $workerDetails := (include "element-io.synapse.enabledWorkers" $) | fromJson }}
+{{- range $workerType, $workerDetails := (include "element-io.synapse.enabledWorkers" .) | fromJson }}
 {{- if include "element-io.synapse.process.hasHttp" $workerType }}
 
 backend {{ $workerType }}
@@ -241,19 +242,19 @@ backend {{ $workerType }}
 {{- $maxInstances := ternary 1 20 (not (empty (include "element-io.synapse.process.isSingle" $workerType))) }}
 {{- $workerTypeName := include "element-io.synapse.process.workerTypeName" $workerType }}
   # Use DNS SRV service discovery on the headless service
-  server-template {{ $workerTypeName }} {{ $maxInstances }} _synapse-http._tcp.{{ $.Release.Name }}-synapse-{{ $workerTypeName }}.{{ $.Release.Namespace }}.svc.cluster.local resolvers kubedns init-addr none
+  server-template {{ $workerTypeName }} {{ $maxInstances }} _synapse-http._tcp.{{ $Release.Name }}-synapse-{{ $workerTypeName }}.{{ $Release.Namespace }}.svc.cluster.local resolvers kubedns init-addr none
 {{- end }}
 {{- end }}
 
 
-{{- range .Values.ingress.additionalPaths -}}
+{{- range $Values.synapse.ingress.additionalPaths -}}
 {{- if eq .availability "internally_and_externally" }}
 {{- $additionalPathId := printf "%s_%s" .service.name (.service.port.name | default .service.port.number) }}
 backend be_{{ $additionalPathId }}
 {{- if .service.port.name }}
-  server-template {{ $additionalPathId }} 10 _{{ .service.port.name }}._tcp.{{ .service.name }}.{{ $.Release.Namespace }}.svc.cluster.local resolvers kubedns init-addr none
+  server-template {{ $additionalPathId }} 10 _{{ .service.port.name }}._tcp.{{ .service.name }}.{{ $Release.Namespace }}.svc.cluster.local resolvers kubedns init-addr none
 {{- else }}
-  server-template {{ $additionalPathId }} 10 _{{ .service.name }}.{{ $.Release.Namespace }}.svc.cluster.local:{{ .service.port.number }} resolvers kubedns init-addr none
+  server-template {{ $additionalPathId }} 10 _{{ .service.name }}.{{ $Release.Namespace }}.svc.cluster.local:{{ .service.port.number }} resolvers kubedns init-addr none
 {{- end }}
 {{- end }}
 {{- end }}
@@ -266,3 +267,6 @@ backend return_204
 # handling overloads etc.
 backend return_500
   http-request deny deny_status 500
+{{- end }}
+{{- end }}
+

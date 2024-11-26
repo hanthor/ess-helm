@@ -3,14 +3,16 @@
 # SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-Element-Commercial
 
 {{- if .Capabilities.APIVersions.Has "monitoring.coreos.com/v1/ServiceMonitor" }}
-{{- if .Values.synapse.serviceMonitors.enabled }}
+{{- with $.Values.synapse }}
+{{- if .enabled }}
+{{- if .serviceMonitors.enabled }}
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
   labels:
     {{- include "element-io.synapse.labels" $ | nindent 4 }}
-  name: {{ .Release.Name }}-synapse
-  namespace: {{ .Release.Namespace }}
+  name: {{ $.Release.Name }}-synapse
+  namespace: {{ $.Release.Namespace }}
 spec:
   endpoints:
   - interval: 30s
@@ -18,11 +20,13 @@ spec:
     relabelings:
     - targetLabel: instance
       action: replace
-      replacement: {{ .Values.synapse.ingress.host }}
+      replacement: {{ .ingress.host }}
   selector:
     matchLabels:
       app.kubernetes.io/part-of: matrix-stack
       app.kubernetes.io/component: matrix-server
-      k8s.element.io/synapse-instance: {{ .Release.Name }}-synapse
+      k8s.element.io/synapse-instance: {{ $.Release.Name }}-synapse
 {{- end }}
 {{- end }}
+{{- end -}}
+{{- end -}}

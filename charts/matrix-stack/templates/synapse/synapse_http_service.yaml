@@ -2,15 +2,17 @@
 #
 # SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-Element-Commercial
 
+{{- with $.Values.synapse }}
+{{- if .enabled }}
 apiVersion: v1
 kind: Service
 metadata:
   labels:
     {{- include "element-io.synapse.haproxy.labels" $ | nindent 4 }}
-  name: {{ .Release.Name }}-synapse-haproxy
-  namespace: {{ .Release.Namespace }}
+  name: {{ $.Release.Name }}-synapse-haproxy
+  namespace: {{ $.Release.Namespace }}
 spec:
-  type: {{ .Values.synapse.ingress.service.type }}
+  type: {{ .ingress.service.type }}
   ports:
   - name: haproxy-http
     port: 8008
@@ -22,4 +24,6 @@ spec:
     port: 8405
     targetPort: haproxy-metrics
   selector:
-    app.kubernetes.io/instance: "{{ .Release.Name }}-synapse-haproxy"
+    app.kubernetes.io/instance: "{{ $.Release.Name }}-synapse-haproxy"
+{{- end -}}
+{{- end -}}

@@ -10,8 +10,8 @@ require_auth_for_profile_requests: true
 
 {{- define "element-io.synapse.config.shared-overrides" -}}
 public_baseurl: https://{{ .Values.synapse.ingress.host }}
-server_name: {{ required "Synapse requires global.ess.server_name set" .Values.synapse.global.ess.server_name }}
-signing_key_path: /secrets/{{ $.Values.synapse.signingKey.secret | default (printf "%s-synapse" $.Release.Name) }}/{{ $.Values.synapse.signingKey.secretKey | default "SIGNING_KEY" }}
+serverName: {{ required "Synapse requires ess.serverName set" .Values.ess.serverName }}
+signing_key_path: /secrets/{{ .Values.synapse.signingKey.secret | default (printf "%s-synapse" .Release.Name) }}/{{ .Values.synapse.signingKey.secretKey | default "SIGNING_KEY" }}
 enable_metrics: true
 log_config: "/conf/log_config.yaml"
 macaroon_secret_key: ${SYNAPSE_MACAROON}
@@ -109,17 +109,17 @@ start_pushers: true
 
 update_user_directory_from_worker: user-dir-0
 {{- end }}
-{{- $enabledWorkers := (include "element-io.synapse.enabledWorkers" $) | fromJson }}
+{{- $enabledWorkers := (include "element-io.synapse.enabledWorkers" .) | fromJson }}
 
 instance_map:
   main:
-    host: {{ $.Release.Name }}-synapse-main.{{ $.Release.Namespace }}.svc.cluster.local.
+    host: {{ .Release.Name }}-synapse-main.{{ .Release.Namespace }}.svc.cluster.local.
     port: 9093
 {{- range $workerType, $workerDetails := $enabledWorkers }}
 {{- if include "element-io.synapse.process.hasReplication" $workerType }}
 {{- range $index := untilStep 0 ($workerDetails.instances | int | default 1) 1 }}
   {{ $workerType }}-{{ $index }}:
-    host: {{ $.Release.Name }}-synapse-{{ $workerType }}-{{ $index }}.{{ $.Release.Name }}-synapse-{{ $workerType }}.{{ $.Release.Namespace }}.svc.cluster.local.
+    host: {{ .Release.Name }}-synapse-{{ $workerType }}-{{ $index }}.{{ .Release.Name }}-synapse-{{ $workerType }}.{{ .Release.Namespace }}.svc.cluster.local.
     port: 9093
 {{- end }}
 {{- end }}
@@ -129,7 +129,7 @@ instance_map:
 
 redis:
   enabled: true
-  host: "{{ $.Release.Name }}-synapse-redis.{{ $.Release.Namespace }}.svc.cluster.local"
+  host: "{{ .Release.Name }}-synapse-redis.{{ .Release.Namespace }}.svc.cluster.local"
 {{- if include "element-io.synapse.streamWriterWorkers" $ | fromJsonArray }}
 
 stream_writers:
@@ -198,7 +198,7 @@ worker_listeners:
   - names: []
     compress: false
 
-{{- $enabledWorkers := (include "element-io.synapse.enabledWorkers" $) | fromJson }}
+{{- $enabledWorkers := (include "element-io.synapse.enabledWorkers" .context) | fromJson }}
 {{- if (include "element-io.synapse.process.responsibleForMedia" (dict "processType" .processType "enabledWorkerTypes" (keys $enabledWorkers))) }}
 enable_media_repo: true
 {{- else }}

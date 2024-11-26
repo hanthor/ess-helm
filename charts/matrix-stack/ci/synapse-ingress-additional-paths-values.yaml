@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-Element-Commercial
 
 ess:
-  server_name: ess.localhost
+  serverName: ess.localhost
 
 synapse:
   ingress:

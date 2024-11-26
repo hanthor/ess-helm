@@ -2,8 +2,10 @@
 #
 # SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-Element-Commercial
 
+{{- with $.Values.synapse }}
+{{- if .enabled }}
 {{- if (include "element-io.synapse.enabledWorkers" $) | fromJson }}
-{{- with .Values.synapse.redis }}
+{{- with .redis }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -13,7 +15,7 @@ metadata:
 {{- end }}
   labels:
     {{- include "element-io.synapse.redis.labels" $ | nindent 4 }}
-    k8s.element.io/confighash: "{{ include (print $.Template.BasePath "/redis_configmap.yaml") $ | sha1sum }}"
+    k8s.element.io/confighash: "{{ include (print $.Template.BasePath "/synapse/redis_configmap.yaml") $ | sha1sum }}"
   name: {{ $.Release.Name }}-synapse-redis
   namespace: {{ $.Release.Namespace }}
 spec:
@@ -30,7 +32,7 @@ spec:
     metadata:
       labels:
         {{- include "element-io.synapse.redis.labels" $ | nindent 8 }}
-        k8s.element.io/confighash: "{{ include (print $.Template.BasePath "/redis_configmap.yaml") $ | sha1sum }}"
+        k8s.element.io/confighash: "{{ include (print $.Template.BasePath "/synapse/redis_configmap.yaml") $ | sha1sum }}"
 {{- with .annotations }}
       annotations:
         {{- toYaml . | nindent 8 }}
@@ -105,3 +107,5 @@ spec:
         name: data
 {{- end }}
 {{- end }}
+{{- end -}}
+{{- end -}}

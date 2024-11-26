@@ -3,9 +3,9 @@
 # SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-Element-Commercial
 
 ess:
-  server_name: ess.localhost
+  serverName: ess.localhost
 
-element-web:
+elementWeb:
   enabled: true
   defaultMatrixServer:
     baseUrl: https://synapse.ess.localhost

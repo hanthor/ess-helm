@@ -2,10 +2,6 @@
   "$id": "file://element-web",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "type": "object",
-  "required": [
-    "defaultMatrixServer",
-    "ingress"
-  ],
   "properties": {
     "enabled": {
       "type": "boolean"

@@ -5,7 +5,7 @@
 {{- define "element-io.ess-library.pods.pullSecrets" -}}
 {{- $ := index . 0 }}
 {{- with index . 1 }}
-{{- $pullSecrets := concat .pullSecrets $.Values.global.ess.imagePullSecrets }}
+{{- $pullSecrets := concat .pullSecrets $.Values.ess.imagePullSecrets }}
 {{- with ($pullSecrets | uniq) }}
 imagePullSecrets:
 {{ toYaml . }}

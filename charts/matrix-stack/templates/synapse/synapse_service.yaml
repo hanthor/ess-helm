@@ -2,6 +2,8 @@
 #
 # SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-Element-Commercial
 
+{{- with $.Values.synapse }}
+{{- if .enabled }}
 {{- range $processType := prepend (keys ((include "element-io.synapse.enabledWorkers" $) | fromJson)) "main" }}
 {{- $perProcessRoot := merge (dict "ProcessType" $processType) $ }}
 apiVersion: v1
@@ -34,3 +36,5 @@ spec:
     app.kubernetes.io/instance: {{ $.Release.Name }}-synapse-{{ $processType }}
 ---
 {{- end }}
+{{- end -}}
+{{- end -}}

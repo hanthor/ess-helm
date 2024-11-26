@@ -6,7 +6,7 @@
     "ess": {
       "$ref": "file://./sub_schemas/ess.json"
     },
-    "element-web": {
+    "elementWeb": {
       "$ref": "file://./element-web/values.schema.json"
     },
     "synapse": {

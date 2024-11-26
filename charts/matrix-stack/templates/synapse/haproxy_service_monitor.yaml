@@ -2,15 +2,17 @@
 #
 # SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-Element-Commercial
 
-{{- if .Capabilities.APIVersions.Has "monitoring.coreos.com/v1/ServiceMonitor" }}
-{{- if .Values.synapse.haproxy.serviceMonitors.enabled }}
+{{- with $.Values.synapse }}
+{{- if .enabled }}
+{{- if $.Capabilities.APIVersions.Has "monitoring.coreos.com/v1/ServiceMonitor" }}
+{{- if .haproxy.serviceMonitors.enabled }}
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
   labels:
     {{- include "element-io.synapse.haproxy.labels" $ | nindent 4 }}
-  name: {{ .Release.Name }}-synapse-haproxy
-  namespace: {{ .Release.Namespace }}
+  name: {{ $.Release.Name }}-synapse-haproxy
+  namespace: {{ $.Release.Namespace }}
 spec:
   endpoints:
   - interval: 30s
@@ -19,6 +21,8 @@ spec:
     matchLabels:
       app.kubernetes.io/part-of: matrix-stack
       app.kubernetes.io/component: matrix-server-ingress
-      app.kubernetes.io/instance: {{ .Release.Name }}-synapse-haproxy
+      app.kubernetes.io/instance: {{ $.Release.Name }}-synapse-haproxy
 {{- end }}
 {{- end }}
+{{- end -}}
+{{- end -}}

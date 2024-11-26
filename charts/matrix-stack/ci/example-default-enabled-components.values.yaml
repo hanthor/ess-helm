@@ -5,9 +5,9 @@
 ## Values file containing minimal values for components that are enabled by default only
 
 ess:
-  server_name: ess.localhost
+  serverName: ess.localhost
 
-element-web:
+elementWeb:
   defaultMatrixServer:
     baseUrl: https://synapse.ess.localhost
 

@@ -2,22 +2,24 @@
 #
 # SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-Element-Commercial
 
+{{- with $.Values.elementWeb }}
+{{- if .enabled }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-{{- with .Values.elementWeb.annotations }}
+{{- with .annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
 {{- end }}
   labels:
     {{- include "element-io.element-web.labels" . | nindent 4 }}
-  name: {{ .Release.Name }}-element-web
-  namespace: {{ .Release.Namespace }}
+  name: {{ $.Release.Name }}-element-web
+  namespace: {{ $.Release.Namespace }}
 spec:
-  replicas: {{ .Values.elementWeb.replicas }}
+  replicas: {{ .replicas }}
   selector:
     matchLabels:
-      app.kubernetes.io/instance: {{ .Release.Name }}-element-web
+      app.kubernetes.io/instance: {{ $.Release.Name }}-element-web
   strategy:
     type: RollingUpdate
     rollingUpdate:
@@ -27,14 +29,14 @@ spec:
     metadata:
       labels:
         {{- include "element-io.element-web.labels" . | nindent 8 }}
-        k8s.element.io/confighash: "{{ include (print $.Template.BasePath "/configmap.yaml") . | sha1sum }}"
-        k8s.element.io/nginxhash: "{{ include (print $.Template.BasePath "/nginx_configmap.yaml") . | sha1sum }}"
-{{- with .Values.elementWeb.annotations }}
+        k8s.element.io/confighash: "{{ include (print $.Template.BasePath "/element-web/configmap.yaml") . | sha1sum }}"
+        k8s.element.io/nginxhash: "{{ include (print $.Template.BasePath "/element-web/nginx_configmap.yaml") . | sha1sum }}"
+{{- with .annotations }}
       annotations:
         {{- toYaml . | nindent 8 }}
 {{- end }}
     spec:
-{{- if gt (.Values.elementWeb.replicas | int) 1 }}
+{{- if gt (.replicas | int) 1 }}
       affinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
@@ -45,27 +47,27 @@ spec:
                 - key: app.kubernetes.io/instance
                   operator: In
                   values:
-                  - "{{ .Release.Name }}-element-web"
+                  - "{{ $.Release.Name }}-element-web"
               topologyKey: kubernetes.io/hostname
 {{- end }}
       automountServiceAccountToken: false
       serviceAccountName: {{ include "element-io.element-web.serviceAccountName" . }}
-{{- include "element-io.ess-library.pods.pullSecrets" (list $ .Values.elementWeb.image) | indent 6 }}
-{{- with .Values.elementWeb.podSecurityContext }}
+{{- include "element-io.ess-library.pods.pullSecrets" (list $ .image) | indent 6 }}
+{{- with .podSecurityContext }}
       securityContext:
         {{- toYaml . | nindent 8 }}
 {{- end }}
-{{- with .Values.elementWeb.nodeSelector }}
+{{- with .nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
 {{- end }}
-{{- with .Values.elementWeb.tolerations }}
+{{- with .tolerations }}
       tolerations:
         {{- toYaml . | nindent 8 }}
 {{- end }}
       containers:
       - name: element-web
-{{- with .Values.elementWeb.image -}}
+{{- with .image -}}
 {{- if .digest }}
         image: "{{ .registry }}/{{ .repository }}@{{ .digest }}"
         imagePullPolicy: {{ .pullPolicy | default "IfNotPresent" }}
@@ -74,7 +76,7 @@ spec:
         imagePullPolicy: {{ .pullPolicy | default "Always" }}
 {{- end }}
 {{- end }}
-{{- with .Values.elementWeb.containersSecurityContext }}
+{{- with .containersSecurityContext }}
         securityContext:
           {{- toYaml . | nindent 10 }}
 {{- end }}
@@ -104,7 +106,7 @@ spec:
             scheme: HTTP
           initialDelaySeconds: 2
           periodSeconds: 3
-{{- with .Values.elementWeb.resources }}
+{{- with .resources }}
         resources:
           {{- toYaml . | nindent 10 }}
 {{- end }}
@@ -123,12 +125,14 @@ spec:
       volumes:
       - configMap:
           defaultMode: 420
-          name: {{ .Release.Name }}-element-web
+          name: {{ $.Release.Name }}-element-web
         name: config
       - configMap:
           defaultMode: 420
-          name: {{ .Release.Name }}-element-web-nginx
+          name: {{ $.Release.Name }}-element-web-nginx
         name: nginx-config
       - emptyDir:
           medium: Memory
         name: nginx-tmp
+{{- end -}}
+{{- end -}}

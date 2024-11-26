@@ -9,7 +9,7 @@
 ess:
   ## The server name of the Matrix Stack. This gets embedded in user IDs & room IDs
   ## It can not change after the initial deployment.
-  # server_name: ess.localhost
+  # serverName: ess.localhost
   
   ## Labels to add to all manifest in this chart and all sub-charts
   labels: {}
@@ -27,7 +27,7 @@ elementWeb:
   additional: {}
 
   ## Defines which Matrix server this Element Web should point at.
-  defaultMatrixServer: {}
+  # defaultMatrixServer: {}
     ## URL where the Matrix server is hosted
     # baseUrl:
 
