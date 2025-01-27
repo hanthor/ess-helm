@@ -1,6 +1,6 @@
 # Copyright 2024 New Vector Ltd
 #
-# SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-Element-Commercial
+# SPDX-License-Identifier: LicenseRef-Element-Commercial
 
 from __future__ import annotations
 
@@ -16,7 +16,7 @@ from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.hazmat.primitives.asymmetric.rsa import RSAPrivateKey
-from cryptography.hazmat.primitives.serialization import load_pem_private_key
+from cryptography.hazmat.primitives.serialization import load_pem_private_key, pkcs12
 from cryptography.x509 import Certificate
 from cryptography.x509.oid import NameOID
 from platformdirs import user_cache_dir
@@ -27,6 +27,20 @@ class CertKey:
     ca: CertKey
     cert: Certificate
     key: RSAPrivateKey
+
+    def cert_bundle_as_pfx(self, password: bytes = None) -> bytes:
+        if password is None:
+            password = b""
+
+        return pkcs12.serialize_key_and_certificates(
+            name=b"certificate",
+            key=self.key,
+            cert=self.cert,
+            cas=None,
+            encryption_algorithm=serialization.BestAvailableEncryption(password)
+            if password
+            else serialization.NoEncryption(),
+        )
 
     def cert_bundle_as_pem(self):
         bundle = []
@@ -41,7 +55,7 @@ class CertKey:
     def key_as_pem(self):
         return self.key.private_bytes(
             encoding=serialization.Encoding.PEM,
-            format=serialization.PrivateFormat.TraditionalOpenSSL,
+            format=serialization.PrivateFormat.PKCS8,
             encryption_algorithm=serialization.NoEncryption(),
         ).decode("utf-8")
 
@@ -112,10 +126,15 @@ def generate_ca(name, root_ca=None) -> CertKey:
         x509.KeyUsage(True, False, False, False, False, True, True, False, False),
         critical=True,
     )
+    builder = builder.add_extension(x509.SubjectKeyIdentifier.from_public_key(public_key), critical=False)
     if root_ca:
+        builder = builder.add_extension(
+            x509.AuthorityKeyIdentifier.from_issuer_public_key(root_ca.cert.public_key()), critical=False
+        )
         certificate = builder.sign(root_ca.key, hashes.SHA256(), default_backend())
         ca = CertKey(ca=root_ca, cert=certificate, key=private_key)
     else:
+        builder = builder.add_extension(x509.AuthorityKeyIdentifier.from_issuer_public_key(public_key), critical=False)
         certificate = builder.sign(private_key, hashes.SHA256(), default_backend())
         ca = CertKey(ca=None, cert=certificate, key=private_key)
     return ca
@@ -143,6 +162,8 @@ def generate_cert(ca, dns_names: list[str]) -> CertKey:
             x509.SubjectAlternativeName([x509.DNSName(dns_name) for dns_name in dns_names]),
             critical=False,
         )
+        .add_extension(x509.SubjectKeyIdentifier.from_public_key(cert_key.public_key()), critical=False)
+        .add_extension(x509.AuthorityKeyIdentifier.from_issuer_public_key(ca.cert.public_key()), critical=False)
     )
     cert = x509_certificate.sign(ca.key, hashes.SHA256(), default_backend())
 
