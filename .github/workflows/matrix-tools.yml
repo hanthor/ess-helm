@@ -84,7 +84,7 @@ jobs:
         id: build_image
         uses: docker/bake-action@v4.1.0
         with:
-          # Only for main branch or releases
+          # Only for tags
           push: "${{ github.ref_type == 'tag' }}"
           files: |
             docker-bake.hcl

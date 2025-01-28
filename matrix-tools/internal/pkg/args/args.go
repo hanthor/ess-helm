@@ -5,8 +5,7 @@
 package args
 
 import (
-	"fmt"
-	"os"
+	"flag"
 	"strings"
 )
 
@@ -19,35 +18,35 @@ type Options struct {
 func ParseArgs(args []string) (*Options, error) {
 	var options Options
 
-	if len(args) < 2 || args[1] != "--render-config" {
-		fmt.Println("Usage: go run main.go --render-config <file1> [<file2>, <...>] --output <file> [--tcpwait <server> <port>]")
-		os.Exit(1)
+	renderConfigSet := flag.NewFlagSet("render-config", flag.ExitOnError)
+	output := renderConfigSet.String("output", "", "Output file for rendering")
+
+	tcpWaitSet := flag.NewFlagSet("tcpwait", flag.ExitOnError)
+	tcpWait := tcpWaitSet.String("address", "", "Address to listen on for TCP connections")
+
+	if args[1] == "render-config" {
+		err := renderConfigSet.Parse(args[2:])
+		if err != nil {
+			return nil, err
+		}
+	} else if args[1] == "tcpwait" {
+		err := tcpWaitSet.Parse(args[2:])
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		return nil, flag.ErrHelp
 	}
 
-	for i := 1; i < len(args); i++ {
-		if args[i] == "--tcpwait" && i+1 < len(args) {
-			options.Address = args[i+1]
-			i++
-		} else if args[i] == "--output" && i+1 < len(args) {
-			options.Output = args[i+1]
-			i++
-		} else if args[i] == "--render-config" && i+1 < len(args) {
-			for j := i + 1; j < len(args); j++ {
-				options.Files = append(options.Files, args[j])
-				if j+1 < len(args) && strings.HasPrefix(args[j+1], "--") {
-					i = j
-					break
-				}
-			}
-		} else if strings.HasPrefix(args[i], "--") {
-			return &Options{}, fmt.Errorf("unknown flag")
+	if *tcpWait != "" {
+		options.Address = *tcpWait
+	}
+	for _, file := range renderConfigSet.Args() {
+		if strings.HasPrefix(file, "-") {
+			return nil, flag.ErrHelp
 		}
+		options.Files = append(options.Files, file)
 	}
-	if options.Output == "" {
-		return &options, fmt.Errorf("missing --output argument\n")
-	}
-	if len(options.Files) < 1 {
-		return &options, fmt.Errorf("missing --render-config argument\n")
-	}
+	options.Output = *output
 	return &options, nil
 }

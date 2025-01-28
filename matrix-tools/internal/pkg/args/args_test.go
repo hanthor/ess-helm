@@ -18,28 +18,27 @@ func TestParseArgs(t *testing.T) {
 	}{
 		{
 			name:     "Invalid number of arguments",
-			args:     []string{"cmd", "--render-config"},
+			args:     []string{"cmd", "render-config"},
 			expected: &Options{},
 			err:      true,
 		},
 		{
 			name: "Missing --output flag",
-			args: []string{"cmd", "--render-config", "file1", "--tcpwait", "server:port"},
+			args: []string{"cmd", "render-config", "file1"},
 			expected: &Options{
-				Files:   []string{"file1"},
-				Address: "server:port",
+				Files: []string{"file1"},
 			},
 			err: true,
 		},
 		{
 			name:     "Invalid flag",
-			args:     []string{"cmd", "--render-config", "file1", "--invalidflag"},
+			args:     []string{"cmd", "render-config", "file1", "-invalidflag"},
 			expected: &Options{},
 			err:      true,
 		},
 		{
 			name: "Multiple files and --output flag",
-			args: []string{"cmd", "--render-config", "file1", "file2", "--output", "outputFile"},
+			args: []string{"cmd", "render-config", "-output", "outputFile", "file1", "file2"},
 			expected: &Options{
 				Files:  []string{"file1", "file2"},
 				Output: "outputFile",
@@ -47,20 +46,21 @@ func TestParseArgs(t *testing.T) {
 			err: false,
 		},
 		{
-			name: "Correct usage",
-			args: []string{"cmd", "--render-config", "file1", "file2", "--output", "outputFile", "--tcpwait", "server:port"},
+			name: "Correct usage of render-config",
+			args: []string{"cmd", "render-config", "-output", "outputFile", "file1", "file2"},
 			expected: &Options{
-				Files:   []string{"file1", "file2"},
-				Output:  "outputFile",
-				Address: "server:port",
+				Files:  []string{"file1", "file2"},
+				Output: "outputFile",
 			},
 			err: false,
 		},
 		{
-			name:     "--tcpwait without parameters",
-			args:     []string{"cmd", "--render-config", "file1", "--tcpwait"},
-			expected: &Options{},
-			err:      true,
+			name: "Correct usage of tcp-wait",
+			args: []string{"cmd", "tcpwait", "-address", "address:port"},
+			expected: &Options{
+				Address: "server:port",
+			},
+			err: false,
 		},
 	}
 
