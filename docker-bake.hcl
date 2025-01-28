@@ -19,5 +19,4 @@ target "matrix-tools" {
   inherits = ["base", "docker-metadata-action"]
   dockerfile = "Dockerfile"
   context = "./matrix-tools"
-  tags = ["ghcr.io/element-hq/matrix-tools:sha-6f9b277"]
 }
