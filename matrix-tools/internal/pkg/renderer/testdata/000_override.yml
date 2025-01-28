@@ -8,3 +8,4 @@ overriddenArray:
 - item_000_b
 overriddenObject:
   childKey: value_000
+only000Key: only_000

@@ -67,6 +67,8 @@ func TestRenderConfig(t *testing.T) {
 				"overriddenObject": map[string]any{
 					"childKey": "value_001",
 				},
+				"only000Key": "only_000",
+				"only001Key": "only_001",
 			},
 			err: false,
 		},
