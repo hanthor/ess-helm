@@ -5,8 +5,8 @@
 package renderer
 
 import (
-	"fmt"
 	"os"
+	"reflect"
 	"testing"
 )
 
@@ -18,7 +18,7 @@ func TestRenderConfig(t *testing.T) {
 		name     string
 		files    []string
 		env      map[string]string
-		expected map[string]interface{}
+		expected map[string]any
 		err      bool
 	}{
 		{
@@ -29,7 +29,7 @@ func TestRenderConfig(t *testing.T) {
 				"SECRET_KEY":    "secret://testdata/secret_key",
 				"THIS_HOSTNAME": "hostname://" + droppedFromHostname,
 			},
-			expected: map[string]interface{}{
+			expected: map[string]any{
 				"key":       "value",
 				"secretKey": "secret_value",
 				"hostname":  hostname[0:2] + hostname[4:],
@@ -43,13 +43,13 @@ func TestRenderConfig(t *testing.T) {
 				"TEST_ENV_1": "env_value_1",
 				"TEST_ENV_2": "env_value_2",
 			},
-			expected: map[string]interface{}{
+			expected: map[string]any{
 				"key_1": "value1",
 				"key2":  "value2",
-				"keyWithEnv1": map[string]interface{}{
+				"keyWithEnv1": map[string]any{
 					"env1": "env_value_1",
 				},
-				"keyWithEnv2": map[string]interface{}{
+				"keyWithEnv2": map[string]any{
 					"content_with_env2": "env_value_2",
 				},
 			},
@@ -81,34 +81,12 @@ func TestRenderConfig(t *testing.T) {
 			if (err != nil) != tc.err {
 				t.Errorf("expected error: %v, got: %v", tc.err, err)
 			}
-			if !tc.err && !deepEqual(result, tc.expected) {
+			if !tc.err && !reflect.DeepEqual(result, tc.expected) {
 				t.Errorf("expected: %v, got: %v", tc.expected, result)
 			}
 			for k := range tc.env {
 				os.Unsetenv(k)
 			}
 		})
-	}
-}
-
-func deepEqual(a, b interface{}) bool {
-	switch a := a.(type) {
-	case map[string]interface{}:
-		bMap, ok := b.(map[string]interface{})
-		if !ok {
-			return false
-		}
-		for key, value := range a {
-			if !deepEqual(value, bMap[key]) {
-				return false
-			}
-		}
-		return true
-	default:
-		if a != b {
-			fmt.Printf("difference: %v != %v\n", a, b)
-			return false
-		}
-		return true
 	}
 }

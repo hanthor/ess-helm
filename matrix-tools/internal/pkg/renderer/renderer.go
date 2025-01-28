@@ -17,14 +17,14 @@ import (
 )
 
 type Config struct {
-	Data map[string]interface{} `json:"data"`
+	Data map[string]any `json:"data"`
 }
 
-func deepMergeMaps(source, destination map[string]interface{}) error {
+func deepMergeMaps(source, destination map[string]any) error {
 	for key, value := range source {
 		if destValue, exists := destination[key]; exists {
-			if srcMap, ok := value.(map[string]interface{}); ok {
-				if destMap, ok := destValue.(map[string]interface{}); ok {
+			if srcMap, ok := value.(map[string]any); ok {
+				if destMap, ok := destValue.(map[string]any); ok {
 					if err := deepMergeMaps(srcMap, destMap); err != nil {
 						return err
 					}
@@ -41,8 +41,8 @@ func deepMergeMaps(source, destination map[string]interface{}) error {
 	return nil
 }
 
-func RenderConfig(sourceFiles []string) (map[string]interface{}, error) {
-	output := make(map[string]interface{})
+func RenderConfig(sourceFiles []string) (map[string]any, error) {
+	output := make(map[string]any)
 
 	for _, sourceFilename := range sourceFiles {
 		if !filepath.IsAbs(sourceFilename) {
@@ -94,7 +94,7 @@ func RenderConfig(sourceFiles []string) (map[string]interface{}, error) {
 			}
 		}
 
-		var data map[string]interface{}
+		var data map[string]any
 		if err := yaml.Unmarshal(fileContent, &data); err != nil {
 			return nil, errors.New("Post-processed YAML of " + sourceFilename + " is invalid: " + string(fileContent) + " with error: " + err.Error())
 		}
