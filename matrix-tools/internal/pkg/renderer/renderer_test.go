@@ -12,6 +12,8 @@ import (
 
 func TestRenderConfig(t *testing.T) {
 	hostname, _ := os.Hostname()
+	droppedFromHostname := hostname[2:4]
+
 	testCases := []struct {
 		name     string
 		files    []string
@@ -25,12 +27,12 @@ func TestRenderConfig(t *testing.T) {
 			env: map[string]string{
 				"TEST_ENV":      "value",
 				"SECRET_KEY":    "secret://testdata/secret_key",
-				"THIS_HOSTNAME": "hostname://",
+				"THIS_HOSTNAME": "hostname://" + droppedFromHostname,
 			},
 			expected: map[string]interface{}{
 				"key":       "value",
 				"secretKey": "secret_value",
-				"hostname":  hostname,
+				"hostname":  hostname[0:2] + hostname[4:],
 			},
 			err: false,
 		},
