@@ -104,6 +104,7 @@ We have an init container to render & merge the config for several reasons:
                  The prefixes `secret://` and `hostname://` are mechanisms handled in the matrix-tools binary:
                  - `secret://` is used to read the secret from the filesystem and inject in the rendered config file
                  - `hostname://` is used to drop the pattern indicated from the hostname and inject resulting value in the config file
+                 - Anything else is handled as a simple string replacement
                   */}}
           - name: SYNAPSE_MACAROON
             value: secret:///secrets/{{ tpl (.macaroon.secret | default (printf "%s-synapse" $.Release.Name)) $ }}/{{ .macaroon.secretKey | default "MACAROON" }}
