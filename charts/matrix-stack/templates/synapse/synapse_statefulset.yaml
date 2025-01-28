@@ -80,13 +80,6 @@ We have an init container to render & merge the config for several reasons:
 {{- end }}
         command:
         - "/matrix-tools"
-          {{- /* The filesystem structure is `/secrets`/<< secret name>>/<< secret key >>.
-                 The non-defaulted values are handling the case where the credential is provided by an existing Secret
-                 The default values are handling the case where the credential is provided plain in the Helm chart and we add it to our Secret with a well-known key.
-
-                 These could be done as env vars with valueFrom.secretKeyRef, but that triggers CKV_K8S_35.
-                 If we wanted to allow for replacement of values in the user-provided config with external Secrets we could extend this init-container
-                 to allow extraEnv with valueFrom.secretKeyRef. */}}
         - render-config
         - -output
         - /conf/homeserver.yaml
@@ -103,6 +96,15 @@ We have an init container to render & merge the config for several reasons:
         - /config-templates/04-homeserver-overrides.yaml
         - /config-templates/05-{{ $processType }}.yaml
         env:
+          {{- /* The filesystem structure is `/secrets`/<< secret name>>/<< secret key >>.
+                 The non-defaulted values are handling the case where the credential is provided by an existing Secret
+                 The default values are handling the case where the credential is provided plain in the Helm chart and we add it to our Secret with a well-known key.
+
+                 These could be done as env vars with valueFrom.secretKeyRef, but that triggers CKV_K8S_35.
+                 The prefixes `secret://` and `hostname://` are mechanisms handled in the matrix-tools binary:
+                 - `secret://` is used to read the secret from the filesystem and inject in the rendered config file
+                 - `hostname://` is used to drop the pattern indicated from the hostname and inject resulting value in the config file
+                  */}}
           - name: SYNAPSE_MACAROON
             value: secret:///secrets/{{ tpl (.macaroon.secret | default (printf "%s-synapse" $.Release.Name)) $ }}/{{ .macaroon.secretKey | default "MACAROON" }}
           - name: SYNAPSE_POSTGRES_PASSWORD
