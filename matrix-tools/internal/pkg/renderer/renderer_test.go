@@ -56,6 +56,21 @@ func TestRenderConfig(t *testing.T) {
 			err: false,
 		},
 		{
+			name:  "Overrides in order",
+			files: []string{"testdata/000_override.yml", "testdata/001_override.yml"},
+			expected: map[string]any{
+				"overriddenKey": "value_001",
+				"overriddenArray": []any{
+					"item_001_a",
+					"item_001_b",
+				},
+				"overriddenObject": map[string]any{
+					"childKey": "value_001",
+				},
+			},
+			err: false,
+		},
+		{
 			name:     "File Does Not Exist",
 			files:    []string{"testdata/nonexistent_file.yml"},
 			expected: nil,
