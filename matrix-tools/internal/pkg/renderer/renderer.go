@@ -64,34 +64,34 @@ func RenderConfig(sourceFiles []string) (map[string]any, error) {
 
 		envVarNames := extractEnvVarNames(string(fileContent))
 		for _, envVar := range envVarNames {
-			if val, ok := os.LookupEnv(envVar); !ok {
+			val, ok := os.LookupEnv(envVar)
+			if !ok {
 				return nil, errors.New(envVar + " is not present in the environment")
-			} else {
-				var replacementValue []byte
-				if strings.HasPrefix(val, "hostname://") {
-					machineHostname, err := os.Hostname()
-					if err != nil {
-						return nil, err
-					}
-					replacementValue = []byte(strings.ReplaceAll(machineHostname, strings.TrimPrefix(val, "hostname://"), ""))
-				} else if strings.HasPrefix(val, "secret://") {
-					filePath := strings.TrimPrefix(val, "secret://")
-					fileBytes, err := os.ReadFile(filePath)
-					if err != nil {
-						return nil, errors.New("failed to read file: " + filePath)
-					}
-					replacementValue, err = json.Marshal(string(fileBytes))
-					if err != nil {
-						return nil, err
-					}
-				} else {
-					replacementValue, err = json.Marshal(val)
-				}
+			}
+			var replacementValue []byte
+			if strings.HasPrefix(val, "hostname://") {
+				machineHostname, err := os.Hostname()
 				if err != nil {
 					return nil, err
 				}
-				fileContent = bytes.ReplaceAll(fileContent, []byte("${"+envVar+"}"), replacementValue)
+				replacementValue = []byte(strings.ReplaceAll(machineHostname, strings.TrimPrefix(val, "hostname://"), ""))
+			} else if strings.HasPrefix(val, "secret://") {
+				filePath := strings.TrimPrefix(val, "secret://")
+				fileBytes, err := os.ReadFile(filePath)
+				if err != nil {
+					return nil, errors.New("failed to read file: " + filePath)
+				}
+				replacementValue, err = json.Marshal(string(fileBytes))
+				if err != nil {
+					return nil, err
+				}
+			} else {
+				replacementValue, err = json.Marshal(val)
 			}
+			if err != nil {
+				return nil, err
+			}
+			fileContent = bytes.ReplaceAll(fileContent, []byte("${"+envVar+"}"), replacementValue)
 		}
 
 		var data map[string]any
