@@ -70,6 +70,7 @@ policy:
     client_registration:
       allow_host_mismatch: false
       allow_insecure_uris: false
+      allow_missing_contacts: true
 
 {{- if $root.Values.synapse.enabled }}
 clients:
