@@ -74,5 +74,12 @@ spec:
         resources:
           {{- toYaml . | nindent 10 }}
 {{- end }}
+      volumeMounts:
+      - name: secrets
+        mountPath: /secrets
+    volumes:
+    - name: secrets
+      secret:
+        secretName: "{{ $.Release.Name }}-element-call-sfu-jwt-secrets"
 {{- end }}
 {{- end }}

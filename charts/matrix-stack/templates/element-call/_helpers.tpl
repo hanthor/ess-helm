@@ -9,8 +9,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 {{- with required "element-io.element-call.labels missing context" .context -}}
 {{ include "element-io.ess-library.labels.common" (dict "root" $root "context" .labels) }}
 app.kubernetes.io/component: matrix-stack-sfu-jwt
-app.kubernetes.io/name: element-call
-app.kubernetes.io/instance: {{ $root.Release.Name }}-element-call
+app.kubernetes.io/name: element-call-sfu-jwt
+app.kubernetes.io/instance: {{ $root.Release.Name }}-element-call-sfu-jwt
 app.kubernetes.io/version: {{ .image.tag }}
 {{- end }}
 {{- end }}

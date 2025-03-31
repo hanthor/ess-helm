@@ -93,42 +93,42 @@ spec:
           {{- toYaml . | nindent 10 }}
 {{- end }}
 {{- with (include "element-io.element-call-sfu.env" (dict "root" $ "context" .)) }}
-      env:
-        {{- . | nindent 8 }}
-{{- end }}
-      hostNetwork: {{ .hostNetwork }}
-      ports:
-      - containerPort: 6789
-        name: metrics
-        protocol: TCP
-      - containerPort: 7887
-        name: http
-        protocol: TCP
-      - containerPort: {{ .exposedServices.rtcTcp.port }}
-{{- if eq .exposedServices.rtcTcp.type "HostPort" }}
-        hostPort: {{ .exposedServices.rtcTcp.port }}
-{{- end }}
-        name: rtc-tcp
-        protocol: TCP
-      - containerPort: {{ .exposedServices.rtcUdp.port }}
-        name: rtc-udp
-        protocol: UDP
-{{- if eq .exposedServices.rtcUdp.type "HostPort" }}
-        hostPort: {{ .exposedServices.rtcUdp.port }}
-{{- end }}
-{{- if .exposedServices.rtcMuxedUdp.enabled }}
-{{- $portType := .type -}}
-{{- with .exposedServices.rtcMuxedUdp.portRange }}
-{{- range $port := seq .startPort .endPort  }}
-        - containerPort: {{ $port }}
-          name: rtc-udp-{{ $port }}
+        env:
+          {{- . | nindent 10 }}
+  {{- end }}
+        hostNetwork: {{ .hostNetwork }}
+        ports:
+        - containerPort: 6789
+          name: metrics
+          protocol: TCP
+        - containerPort: 7887
+          name: http
+          protocol: TCP
+        - containerPort: {{ .exposedServices.rtcTcp.port }}
+  {{- if eq .exposedServices.rtcTcp.type "HostPort" }}
+          hostPort: {{ .exposedServices.rtcTcp.port }}
+  {{- end }}
+          name: rtc-tcp
+          protocol: TCP
+        - containerPort: {{ .exposedServices.rtcUdp.port }}
+          name: rtc-udp
           protocol: UDP
-{{ if eq .type "HostPort" }}
-          hostPort: {{ $port }}
-{{- end }}
-{{- end }}
-{{- end }}
-{{- end }}
+  {{- if eq .exposedServices.rtcUdp.type "HostPort" }}
+          hostPort: {{ .exposedServices.rtcUdp.port }}
+  {{- end }}
+  {{- if .exposedServices.rtcMuxedUdp.enabled }}
+  {{- $portType := .type -}}
+  {{- with .exposedServices.rtcMuxedUdp.portRange }}
+  {{- range $port := seq .startPort .endPort  }}
+          - containerPort: {{ $port }}
+            name: rtc-udp-{{ $port }}
+            protocol: UDP
+  {{ if eq .type "HostPort" }}
+            hostPort: {{ $port }}
+  {{- end }}
+  {{- end }}
+  {{- end }}
+  {{- end }}
         livenessProbe:
           httpGet:
             path: /
@@ -161,6 +161,9 @@ spec:
           name: "{{ $.Release.Name }}-element-call-sfu"
           defaultMode: 420
         name: plain-config
+      - emptyDir:
+          medium: Memory
+        name: "rendered-config"
 {{- end }}
 {{- end }}
 {{- end -}}
