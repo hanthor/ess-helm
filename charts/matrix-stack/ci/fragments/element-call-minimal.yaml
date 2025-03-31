@@ -1,0 +1,8 @@
+# Copyright 2025 New Vector Ltd
+#
+# SPDX-License-Identifier: AGPL-3.0-only
+
+elementCall:
+  enabled: true
+  ingress:
+    host: rtc.ess.localhost

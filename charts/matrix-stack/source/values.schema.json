@@ -54,6 +54,9 @@
     "initSecrets": {
       "$ref": "file://init-secrets.json"
     },
+    "elementCall": {
+      "$ref": "file://element-call.json"
+    },
     "elementWeb": {
       "$ref": "file://element-web.json"
     },
