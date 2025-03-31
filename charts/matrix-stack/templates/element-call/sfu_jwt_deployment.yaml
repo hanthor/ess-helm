@@ -1,0 +1,78 @@
+{{- /*
+Copyright 2024 New Vector Ltd
+
+SPDX-License-Identifier: AGPL-3.0-only
+*/ -}}
+
+{{- with .Values.elementCall -}}
+{{- if .enabled -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+{{- with .annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+{{- end }}
+  labels:
+    {{- include "element-io.element-call.sfu-jwt.labels" (dict "root" $ "context" .) | nindent 4 }}
+  name: {{ $.Release.Name }}-element-call-sfu-jwt
+  namespace: {{ $.Release.Namespace }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: {{ $.Release.Name }}-element-call-sfu-jwt
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 2
+  template:
+    metadata:
+      labels:
+        {{- include "element-io.element-call.sfu-jwt.labels" (dict "root" $ "context" .) | nindent 8 }}
+{{- with .annotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+{{- end }}
+    spec:
+{{- include "element-io.ess-library.pods.commonSpec" (dict "root" $ "context" (dict "componentValues" . "key" "element-call" "deployment" true)) | nindent 6 }}
+      containers:
+      - name: sfu-jwt
+{{- with .image -}}
+{{- if .digest }}
+        image: "{{ .registry }}/{{ .repository }}@{{ .digest }}"
+        imagePullPolicy: {{ .pullPolicy | default "IfNotPresent" }}
+{{- else }}
+        image: "{{ .registry }}/{{ .repository }}:{{ required ".elementCall.image.tag is required if no digest" .tag }}"
+        imagePullPolicy: {{ .pullPolicy | default "Always" }}
+{{- end }}
+{{- end }}
+{{- with .containersSecurityContext }}
+        securityContext:
+          {{- toYaml . | nindent 10 }}
+{{- end }}
+      env:
+        {{- include "element-io.element-call.sfu-jwt.env" (dict "root" $ "context" .) | nindent 8 }}
+        ports:
+        - containerPort: 8080
+          name: http
+          protocol: TCP
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: http
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: http
+        startupProbe:
+          httpGet:
+            path: /healthz
+            port: http
+{{- with .resources }}
+        resources:
+          {{- toYaml . | nindent 10 }}
+{{- end }}
+{{- end }}
+{{- end }}
