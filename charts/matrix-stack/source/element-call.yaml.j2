@@ -7,6 +7,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 {% import 'sub_schema_values.yaml.j2' as sub_schema_values -%}
 enabled: true
 
+{{- sub_schema_values.credential("The API key for the LiveKit SFU", "livekitKey", initIfAbsent=True) }}
+{{- sub_schema_values.credential("The secret for the LiveKit SFU", "livekitSecret", initIfAbsent=True) }}
+
 {{- sub_schema_values.ingress() -}}
 {{- sub_schema_values.extraEnv() }}
 
@@ -22,6 +25,30 @@ enabled: true
 
 sfu:
   enabled: true
+
+  # LiveKit Logging level
+  logging:
+    # log level, valid values: debug, info, warn, error
+    level: info
+    # log level for pion, default error
+    pionLevel: error
+    # when set to true, emit json fields
+    json: false
+
+  # Wether to advertise the external IP of the SFU during ICE Negociations
+  # Should be true unless you are using `hostMode: true`
+  useExternalIp: true
+  # A list of stun servers to use
+  # The SFU will fallback to google stun servers if the list is empty
+  stunServers: []
+  # Whether to start the SFU in host network mode or not
+  hostNetwork: false
+  exposedServices:
+    {{- sub_schema_values.exposedServicePort('rtcTcp', 30881, 'NodePort') -}}
+    {{- sub_schema_values.exposedServicePort('rtcUdp', 30882, 'NodePort') -}}
+    {{- sub_schema_values.exposedServicePortRange('rtcMuxedUdp', 31000, 32000, 'NodePort') -}}
+
+
 {{- sub_schema_values.image(registry='docker.io', repository='livekit/livekit-server', tag='v1.7.2') | indent(2) }}
 {{- sub_schema_values.labels() | indent(2) }}
 {{- sub_schema_values.workloadAnnotations() | indent(2) }}

@@ -506,6 +506,36 @@
         "enabled": {
           "type": "boolean"
         },
+        "livekitKey": {
+          "type": "object",
+          "properties": {
+            "value": {
+              "type": "string"
+            },
+            "secret": {
+              "type": "string"
+            },
+            "secretKey": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        },
+        "livekitSecret": {
+          "type": "object",
+          "properties": {
+            "value": {
+              "type": "string"
+            },
+            "secret": {
+              "type": "string"
+            },
+            "secretKey": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        },
         "extraEnv": {
           "type": "array",
           "items": {
@@ -986,6 +1016,77 @@
               "additionalProperties": {
                 "type": "string"
               }
+            },
+            "exposedServices": {
+              "type": "object",
+              "properties": {
+                "rtcTcp": {
+                  "type": "object",
+                  "required": [
+                    "portType",
+                    "port"
+                  ],
+                  "properties": {
+                    "portType": {
+                      "type": "string"
+                    },
+                    "port": {
+                      "type": "number"
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                "rtcUdp": {
+                  "type": "object",
+                  "required": [
+                    "portType",
+                    "port"
+                  ],
+                  "properties": {
+                    "portType": {
+                      "type": "string"
+                    },
+                    "port": {
+                      "type": "number"
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                "rtcMuxedUdp": {
+                  "type": "object",
+                  "required": [
+                    "enabled",
+                    "portType",
+                    "portRange"
+                  ],
+                  "properties": {
+                    "enabled": {
+                      "type": "boolean"
+                    },
+                    "portType": {
+                      "type": "string"
+                    },
+                    "portRange": {
+                      "type": "object",
+                      "required": [
+                        "startPort",
+                        "endPort"
+                      ],
+                      "properties": {
+                        "startPort": {
+                          "type": "number"
+                        },
+                        "endPort": {
+                          "type": "number"
+                        }
+                      },
+                      "additionalProperties": false
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              },
+              "additionalProperties": false
             },
             "containersSecurityContext": {
               "properties": {
