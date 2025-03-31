@@ -372,8 +372,9 @@ labels: {}
   enabled: false
   # Either a NodePort or a HostPort
   portType: {{ portType }}
-  # The beginning port of the range
-  startPort: {{ startPort }}
-  # The last port of the range
-  endPort: {{ endPort }}
+  portRange:
+    # The beginning port of the range
+    startPort: {{ startPort }}
+    # The last port of the range
+    endPort: {{ endPort }}
 {%- endmacro %}

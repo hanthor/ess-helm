@@ -74,6 +74,9 @@ spec:
           readOnly: true
       containers:
       - name: sfu
+        args:
+        - --config
+        - /conf/config.yaml
 {{- with .image -}}
 {{- if .digest }}
         image: "{{ .registry }}/{{ .repository }}@{{ .digest }}"
@@ -87,8 +90,10 @@ spec:
         securityContext:
           {{- toYaml . | nindent 10 }}
 {{- end }}
+{{- with (include "element-io.element-call.sfu.env" (dict "root" $ "context" .)) }}
       env:
-        {{- include "element-io.element-call.sfu.env" (dict "root" $ "context" .) | nindent 8 }}
+        {{- . | nindent 8 }}
+{{- end }}
       hostNetwork: {{ .hostNetwork }}
       ports:
       - containerPort: 6789
@@ -97,28 +102,27 @@ spec:
       - containerPort: 7887
         name: http
         protocol: TCP
-      - containerPort: {{ config.sfu.rtc.tcp_port }}
+      - containerPort: {{ .exposedServices.rtcTcp.port }}
 {{- if eq .exposedServices.rtcTcp.type "HostPort" }}
-        hostPort: {{ .exposedServices.tcpTcp.port }}
+        hostPort: {{ .exposedServices.rtcTcp.port }}
 {{- end }}
         name: rtc-tcp
         protocol: TCP
-      - containerPort: {{ .exposedServices.tcpUdp.port }}
+      - containerPort: {{ .exposedServices.rtcUdp.port }}
         name: rtc-udp
         protocol: UDP
 {{- if eq .exposedServices.rtcUdp.type "HostPort" }}
         hostPort: {{ .exposedServices.rtcUdp.port }}
 {{- end }}
-{{- end }}
 {{- if .exposedServices.rtcMuxedUdp.enabled }}
 {{- $portType := .type -}}
 {{- with .exposedServices.rtcMuxedUdp.portRange }}
-{{- range $ports := seq .startPort .endPort  }}
+{{- range $port := seq .startPort .endPort  }}
         - containerPort: {{ $port }}
           name: rtc-udp-{{ $port }}
           protocol: UDP
 {{ if eq .type "HostPort" }}
-          hostPort: {{ port }}
+          hostPort: {{ $port }}
 {{- end }}
 {{- end }}
 {{- end }}

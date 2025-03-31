@@ -26,6 +26,16 @@ app.kubernetes.io/version: {{ .image.tag }}
 {{- end }}
 {{- end }}
 
+{{- define "element-io.element-call.sfu.labels" -}}
+{{- $root := .root -}}
+{{- with required "element-io.element-call.labels missing context" .context -}}
+{{ include "element-io.ess-library.labels.common" (dict "root" $root "context" .labels) }}
+app.kubernetes.io/component: matrix-stack-rtc
+app.kubernetes.io/name: element-call-sfu
+app.kubernetes.io/instance: {{ $root.Release.Name }}-element-call-sfu
+app.kubernetes.io/version: {{ .image.tag }}
+{{- end }}
+{{- end }}
 
 {{- define "element-io.element-call.sfu-jwt.env" }}
 {{- $root := .root -}}
@@ -55,10 +65,20 @@ app.kubernetes.io/version: {{ .image.tag }}
       )
     ) }}
 - name: LIVEKIT_URL
-  value: "wss://{{ ingress.host }}"
+  value: "wss://{{ .ingress.host }}"
 {{- range $key, $value := $resultEnv }}
 - name: {{ $key | quote }}
   value: {{ $value | quote }}
+{{- end -}}
+{{- end -}}
+{{- end -}}
+
+{{- define "element-io.element-call.sfu.env" }}
+{{- $root := .root -}}
+{{- with required "element-io.sfu-jwt missing context" .context -}}
+{{- $resultEnv := dict -}}
+{{- range $envEntry := .extraEnv -}}
+{{- $_ := set $resultEnv $envEntry.name $envEntry.value -}}
 {{- end -}}
 {{- end -}}
 {{- end -}}

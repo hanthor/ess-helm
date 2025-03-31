@@ -54,22 +54,22 @@ spec:
 {{- end }}
       env:
         {{- include "element-io.element-call.sfu-jwt.env" (dict "root" $ "context" .) | nindent 8 }}
-        ports:
-        - containerPort: 8080
-          name: http
-          protocol: TCP
-        livenessProbe:
-          httpGet:
-            path: /healthz
-            port: http
-        readinessProbe:
-          httpGet:
-            path: /healthz
-            port: http
-        startupProbe:
-          httpGet:
-            path: /healthz
-            port: http
+      ports:
+      - containerPort: 8080
+        name: http
+        protocol: TCP
+      livenessProbe:
+        httpGet:
+          path: /healthz
+          port: http
+      readinessProbe:
+        httpGet:
+          path: /healthz
+          port: http
+      startupProbe:
+        httpGet:
+          path: /healthz
+          port: http
 {{- with .resources }}
         resources:
           {{- toYaml . | nindent 10 }}

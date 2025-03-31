@@ -1017,6 +1017,45 @@
                 "type": "string"
               }
             },
+            "useExternalIp": {
+              "type": "boolean"
+            },
+            "hostNetwork": {
+              "type": "boolean"
+            },
+            "stunServers": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "logging": {
+              "type": "object",
+              "properties": {
+                "level": {
+                  "type": "string",
+                  "enum": [
+                    "debug",
+                    "info",
+                    "warn",
+                    "error"
+                  ]
+                },
+                "pionLevel": {
+                  "type": "string",
+                  "enum": [
+                    "debug",
+                    "info",
+                    "warn",
+                    "error"
+                  ]
+                },
+                "json": {
+                  "type": "boolean"
+                }
+              },
+              "additionalProperties": false
+            },
             "exposedServices": {
               "type": "object",
               "properties": {

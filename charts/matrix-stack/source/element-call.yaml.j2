@@ -30,23 +30,23 @@ sfu:
   logging:
     # log level, valid values: debug, info, warn, error
     level: info
-    # log level for pion, default error
+    # log level for pion, default error
     pionLevel: error
     # when set to true, emit json fields
     json: false
 
-  # Wether to advertise the external IP of the SFU during ICE Negociations
+  # Wether to advertise the external IP of the SFU during ICE Negociations
   # Should be true unless you are using `hostMode: true`
   useExternalIp: true
-  # A list of stun servers to use
-  # The SFU will fallback to google stun servers if the list is empty
+  # A list of stun servers to use
+  # The SFU will fallback to google stun servers if the list is empty
   stunServers: []
   # Whether to start the SFU in host network mode or not
   hostNetwork: false
   exposedServices:
-    {{- sub_schema_values.exposedServicePort('rtcTcp', 30881, 'NodePort') -}}
-    {{- sub_schema_values.exposedServicePort('rtcUdp', 30882, 'NodePort') -}}
-    {{- sub_schema_values.exposedServicePortRange('rtcMuxedUdp', 31000, 32000, 'NodePort') -}}
+    {{- sub_schema_values.exposedServicePort('rtcTcp', 30881, 'NodePort') | indent(4) }}
+    {{- sub_schema_values.exposedServicePort('rtcUdp', 30882, 'NodePort') | indent(4) }}
+    {{- sub_schema_values.exposedServicePortRange('rtcMuxedUdp', 31000, 32000, 'NodePort') | indent(4) }}
 
 
 {{- sub_schema_values.image(registry='docker.io', repository='livekit/livekit-server', tag='v1.7.2') | indent(2) }}

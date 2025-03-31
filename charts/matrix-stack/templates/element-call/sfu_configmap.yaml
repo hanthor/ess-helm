@@ -18,21 +18,21 @@ data:
   keys.yaml: |
     {{ printf "{{ readfile \"/secrets/%s\" | quote }}" (
           include "element-io.ess-library.init-secret-path" (
-              dict "root" $root
+              dict "root" $
               "context" (dict
                 "secretPath" "elementCall.livekitKey"
                 "initSecretKey" "ELEMENT_CALL_LIVEKIT_KEY"
-                "defaultSecretName" (printf "%s-element-call" $root.Release.Name)
+                "defaultSecretName" (printf "%s-element-call" $.Release.Name)
                 "defaultSecretKey" "LIVEKIT_KEY"
               )
           )
         ) }}: {{ printf "{{ readfile \"/secrets/%s\" | quote }}" (
           include "element-io.ess-library.init-secret-path" (
-              dict "root" $root
+              dict "root" $
               "context" (dict
                 "secretPath" "elementCall.livekitSecret"
                 "initSecretKey" "ELEMENT_CALL_LIVEKIT_SECRET"
-                "defaultSecretName" (printf "%s-element-call" $root.Release.Name)
+                "defaultSecretName" (printf "%s-element-call" $.Release.Name)
                 "defaultSecretKey" "LIVEKIT_SECRET"
               )
           )
