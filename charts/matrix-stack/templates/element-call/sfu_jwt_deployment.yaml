@@ -36,7 +36,7 @@ spec:
         {{- toYaml . | nindent 8 }}
 {{- end }}
     spec:
-{{- include "element-io.ess-library.pods.commonSpec" (dict "root" $ "context" (dict "componentValues" . "key" "element-call" "deployment" true)) | nindent 6 }}
+{{- include "element-io.ess-library.pods.commonSpec" (dict "root" $ "context" (dict "componentValues" . "key" "element-call-sfu-jwt" "deployment" true)) | nindent 6 }}
       containers:
       - name: sfu-jwt
 {{- with .image -}}

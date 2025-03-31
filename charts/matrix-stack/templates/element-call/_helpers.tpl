@@ -39,7 +39,7 @@ app.kubernetes.io/version: {{ .image.tag }}
     dict "root" $root "context" (
       dict "secretPath" "elementCall.livekitKey"
            "initSecretKey" "ELEMENT_CALL_LIVEKIT_KEY"
-           "defaultSecretName" (printf "%s-element-call" $root.Release.Name)
+           "defaultSecretName" (printf "%s-element-call-sfu-jwt" $root.Release.Name)
            "defaultSecretKey" "LIVEKIT_KEY"
       )
     ) }}
@@ -49,7 +49,7 @@ app.kubernetes.io/version: {{ .image.tag }}
     dict "root" $root "context" (
       dict "secretPath" "elementCall.livekitSecret"
            "initSecretKey" "ELEMENT_CALL_LIVEKIT_SECRET"
-           "defaultSecretName" (printf "%s-element-call" $root.Release.Name)
+           "defaultSecretName" (printf "%s-element-call-sfu-jwt" $root.Release.Name)
            "defaultSecretKey" "LIVEKIT_SECRET"
       )
     ) }}

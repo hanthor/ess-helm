@@ -19,7 +19,7 @@ spec:
   type: ClusterIP
   ports:
   - name: http
-    port: 8080
+    port: 7880
     targetPort: http
   selector:
     app.kubernetes.io/instance: "{{ $.Release.Name }}-element-call-sfu"

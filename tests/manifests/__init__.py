@@ -39,6 +39,7 @@ class DeployableDetails(abc.ABC):
     has_db: bool = field(default=False, hash=False)
     has_image: bool | None = field(default=None, hash=False)
     has_ingress: bool = field(default=True, hash=False)
+    uses_shared_ingress: bool = field(default=False, hash=False)
     has_workloads: bool = field(default=True, hash=False)
     has_service_monitor: bool = field(default=True, hash=False)
 
@@ -180,11 +181,7 @@ all_components_details = [
         value_file_prefix="element-call",
         helm_key="elementCall",
         sub_components=[
-            SubComponentDetails(
-                name="element-call-sfu",
-                helm_key="sfu",
-                has_ingress=False,
-            )
+            SubComponentDetails(name="element-call-sfu", helm_key="sfu", has_ingress=False, uses_shared_ingress=True)
         ],
         shared_component_names=["init-secrets"],
     ),

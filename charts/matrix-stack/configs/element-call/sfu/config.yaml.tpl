@@ -7,7 +7,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 {{- $root := .root -}}
 {{- with required "element-call/sfu/config.yaml.tpl missing context" .context -}}
 
-port: 7887
+port: 7880
 # WebRTC configuration
 rtc:
   tcp_port: {{ .exposedServices.rtcTcp.port }}
