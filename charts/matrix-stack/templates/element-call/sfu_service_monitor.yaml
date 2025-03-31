@@ -1,0 +1,30 @@
+{{- /*
+Copyright 2024 New Vector Ltd
+
+SPDX-License-Identifier: AGPL-3.0-only
+*/ -}}
+
+{{- with .Values.elementCall.sfu -}}
+{{- if .enabled -}}
+{{- if $.Capabilities.APIVersions.Has "monitoring.coreos.com/v1/ServiceMonitor" }}
+{{- if .serviceMonitors.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+    {{- include "element-io.element-call.sfu.labels" (dict "root" $ "context" .) | nindent 4 }}
+  name: {{ $.Release.Name }}-element-call-sfu
+  namespace: {{ $.Release.Namespace }}
+spec:
+  endpoints:
+  - interval: 30s
+    port: http
+  selector:
+    matchLabels:
+      app.kubernetes.io/part-of: matrix-stack
+      app.kubernetes.io/component: matrix-stack-rtc
+      app.kubernetes.io/instance: {{ $.Release.Name }}-element-call-sfu
+{{- end }}
+{{- end }}
+{{- end -}}
+{{- end -}}

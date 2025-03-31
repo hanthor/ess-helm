@@ -1,0 +1,159 @@
+{{- /*
+Copyright 2024 New Vector Ltd
+
+SPDX-License-Identifier: AGPL-3.0-only
+*/ -}}
+
+{{- with .Values.elementCall.sfu -}}
+{{- if .enabled -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+{{- with .annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+{{- end }}
+  labels:
+    {{- include "element-io.element-call.sfu.labels" (dict "root" $ "context" .) | nindent 4 }}
+  name: {{ $.Release.Name }}-element-call-sfu
+  namespace: {{ $.Release.Namespace }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: {{ $.Release.Name }}-element-call-sfu
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 2
+  template:
+    metadata:
+      labels:
+        {{- include "element-io.element-call.sfu.labels" (dict "root" $ "context" .) | nindent 8 }}
+{{- with .annotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+{{- end }}
+    spec:
+{{- include "element-io.ess-library.pods.commonSpec" (dict "root" $ "context" (dict "componentValues" . "key" "element-call" "deployment" true)) | nindent 6 }}
+      initContainers:
+      - name: render-config
+{{- with $.Values.matrixTools.image -}}
+{{- if .digest }}
+        image: "{{ .registry }}/{{ .repository }}@{{ .digest }}"
+        imagePullPolicy: {{ .pullPolicy | default "IfNotPresent" }}
+{{- else }}
+        image: "{{ .registry }}/{{ .repository }}:{{ required "synapse.image.tag is required if no digest" .tag }}"
+        imagePullPolicy: {{ .pullPolicy | default "Always" }}
+{{- end }}
+{{- end }}
+{{- with .containersSecurityContext }}
+        securityContext:
+          {{- toYaml . | nindent 10 }}
+{{- end }}
+        command:
+        - "/matrix-tools"
+        - render-config
+        - -output
+        - /conf/keys.yaml
+        - /config-templates/keys.yaml
+{{- with .resources }}
+        resources:
+          {{- toYaml . | nindent 10 }}
+{{- end }}
+        volumeMounts:
+        - mountPath: /config-templates
+          name: plain-config
+          readOnly: true
+        - mountPath: /conf
+          name: rendered-config
+          readOnly: false
+        - mountPath: /secrets
+          name: secrets
+          readOnly: true
+      containers:
+      - name: sfu
+{{- with .image -}}
+{{- if .digest }}
+        image: "{{ .registry }}/{{ .repository }}@{{ .digest }}"
+        imagePullPolicy: {{ .pullPolicy | default "IfNotPresent" }}
+{{- else }}
+        image: "{{ .registry }}/{{ .repository }}:{{ required ".elementCall.image.tag is required if no digest" .tag }}"
+        imagePullPolicy: {{ .pullPolicy | default "Always" }}
+{{- end }}
+{{- end }}
+{{- with .containersSecurityContext }}
+        securityContext:
+          {{- toYaml . | nindent 10 }}
+{{- end }}
+      env:
+        {{- include "element-io.element-call.sfu.env" (dict "root" $ "context" .) | nindent 8 }}
+      hostNetwork: {{ .hostNetwork }}
+      ports:
+      - containerPort: 6789
+        name: metrics
+        protocol: TCP
+      - containerPort: 7887
+        name: http
+        protocol: TCP
+      - containerPort: {{ config.sfu.rtc.tcp_port }}
+{{- if eq .exposedServices.rtcTcp.type "HostPort" }}
+        hostPort: {{ .exposedServices.tcpTcp.port }}
+{{- end }}
+        name: rtc-tcp
+        protocol: TCP
+      - containerPort: {{ .exposedServices.tcpUdp.port }}
+        name: rtc-udp
+        protocol: UDP
+{{- if eq .exposedServices.rtcUdp.type "HostPort" }}
+        hostPort: {{ .exposedServices.rtcUdp.port }}
+{{- end }}
+{{- end }}
+{{- if .exposedServices.rtcMuxedUdp.enabled }}
+{{- $portType := .type -}}
+{{- with .exposedServices.rtcMuxedUdp.portRange }}
+{{- range $ports := seq .startPort .endPort  }}
+        - containerPort: {{ $port }}
+          name: rtc-udp-{{ $port }}
+          protocol: UDP
+{{ if eq .type "HostPort" }}
+          hostPort: {{ port }}
+{{- end }}
+{{- end }}
+{{- end }}
+{{- end }}
+        livenessProbe:
+          httpGet:
+            path: /
+            port: http
+        readinessProbe:
+          httpGet:
+            path: /
+            port: http
+        startupProbe:
+          httpGet:
+            path: /
+            port: http
+{{- with .resources }}
+        resources:
+          {{- toYaml . | nindent 10 }}
+{{- end }}
+        volumeMounts:
+        - mountPath: /conf/keys.yaml
+          name: rendered-config
+          subPath: keys.yaml
+        - mountPath: /conf/config.yaml
+          name: plain-config
+          subPath: config.yaml
+      volumes:
+      - secret:
+          secretName: "{{ $.Release.Name }}-element-call"
+          defaultMode: 384
+        name: secrets
+      - configMap:
+          name: "{{ $.Release.Name }}-element-call-sfu"
+          defaultMode: 420
+        name: plain-config
+{{- end }}
+{{- end }}
