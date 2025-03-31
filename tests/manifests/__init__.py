@@ -173,6 +173,17 @@ all_components_details = [
         is_shared_component=True,
     ),
     ComponentDetails(
+        name="element-call",
+        helm_key="elementCall",
+        sub_components=[
+            SubComponentDetails(
+                name="sfu",
+                helm_key="sfu",
+                has_ingress=False,
+            )
+        ]
+    ),
+    ComponentDetails(
         name="element-web",
         helm_key="elementWeb",
         has_service_monitor=False,

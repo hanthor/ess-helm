@@ -152,7 +152,7 @@ spec:
           subPath: config.yaml
       volumes:
       - secret:
-          secretName: "{{ $.Release.Name }}-element-call"
+          secretName: "{{ $.Release.Name }}-element-call-sfu-jwt"
           defaultMode: 384
         name: secrets
       - configMap:
