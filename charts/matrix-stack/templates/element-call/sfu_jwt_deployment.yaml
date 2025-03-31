@@ -4,7 +4,7 @@ Copyright 2024 New Vector Ltd
 SPDX-License-Identifier: AGPL-3.0-only
 */ -}}
 
-{{- with .Values.elementCall -}}
+{{- with $.Values.elementCall -}}
 {{- if .enabled -}}
 apiVersion: apps/v1
 kind: Deployment
@@ -14,7 +14,7 @@ metadata:
     {{- toYaml . | nindent 4 }}
 {{- end }}
   labels:
-    {{- include "element-io.element-call.sfu-jwt.labels" (dict "root" $ "context" .) | nindent 4 }}
+    {{- include "element-io.element-call-sfu-jwt.labels" (dict "root" $ "context" .) | nindent 4 }}
   name: {{ $.Release.Name }}-element-call-sfu-jwt
   namespace: {{ $.Release.Namespace }}
 spec:
@@ -30,7 +30,7 @@ spec:
   template:
     metadata:
       labels:
-        {{- include "element-io.element-call.sfu-jwt.labels" (dict "root" $ "context" .) | nindent 8 }}
+        {{- include "element-io.element-call-sfu-jwt.labels" (dict "root" $ "context" .) | nindent 8 }}
 {{- with .annotations }}
       annotations:
         {{- toYaml . | nindent 8 }}
@@ -53,7 +53,7 @@ spec:
           {{- toYaml . | nindent 10 }}
 {{- end }}
       env:
-        {{- include "element-io.element-call.sfu-jwt.env" (dict "root" $ "context" .) | nindent 8 }}
+        {{- include "element-io.element-call-sfu-jwt.env" (dict "root" $ "context" .) | nindent 8 }}
       ports:
       - containerPort: 8080
         name: http

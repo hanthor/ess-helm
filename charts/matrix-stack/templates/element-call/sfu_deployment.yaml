@@ -4,7 +4,9 @@ Copyright 2024 New Vector Ltd
 SPDX-License-Identifier: AGPL-3.0-only
 */ -}}
 
-{{- with .Values.elementCall.sfu -}}
+{{- with $.Values.elementCall -}}
+{{- if .enabled -}}
+{{- with .sfu -}}
 {{- if .enabled -}}
 apiVersion: apps/v1
 kind: Deployment
@@ -14,7 +16,7 @@ metadata:
     {{- toYaml . | nindent 4 }}
 {{- end }}
   labels:
-    {{- include "element-io.element-call.sfu.labels" (dict "root" $ "context" .) | nindent 4 }}
+    {{- include "element-io.element-call-sfu.labels" (dict "root" $ "context" .) | nindent 4 }}
   name: {{ $.Release.Name }}-element-call-sfu
   namespace: {{ $.Release.Namespace }}
 spec:
@@ -30,7 +32,7 @@ spec:
   template:
     metadata:
       labels:
-        {{- include "element-io.element-call.sfu.labels" (dict "root" $ "context" .) | nindent 8 }}
+        {{- include "element-io.element-call-sfu.labels" (dict "root" $ "context" .) | nindent 8 }}
 {{- with .annotations }}
       annotations:
         {{- toYaml . | nindent 8 }}
@@ -90,7 +92,7 @@ spec:
         securityContext:
           {{- toYaml . | nindent 10 }}
 {{- end }}
-{{- with (include "element-io.element-call.sfu.env" (dict "root" $ "context" .)) }}
+{{- with (include "element-io.element-call-sfu.env" (dict "root" $ "context" .)) }}
       env:
         {{- . | nindent 8 }}
 {{- end }}
@@ -161,3 +163,5 @@ spec:
         name: plain-config
 {{- end }}
 {{- end }}
+{{- end -}}
+{{- end -}}

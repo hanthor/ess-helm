@@ -20,6 +20,7 @@ enabled: true
 {{- sub_schema_values.nodeSelector() }}
 {{- sub_schema_values.podSecurityContext(user_id='10033', group_id='10033') }}
 {{- sub_schema_values.resources(requests_memory='20Mi', requests_cpu='50m', limits_memory='20Mi') }}
+{{- sub_schema_values.serviceMonitors() }}
 {{- sub_schema_values.serviceAccount() }}
 {{- sub_schema_values.tolerations() }}
 

@@ -30,6 +30,9 @@
     "containersSecurityContext": {
       "$ref": "file://common/containersSecurityContext.json"
     },
+    "serviceMonitors": {
+      "$ref": "file://common/serviceMonitors.json"
+    },
     "nodeSelector": {
       "$ref": "file://common/nodeSelector.json"
     },

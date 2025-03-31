@@ -4,7 +4,9 @@ Copyright 2024 New Vector Ltd
 SPDX-License-Identifier: AGPL-3.0-only
 */ -}}
 
-{{- with .Values.elementCall.sfu -}}
+{{- with $.Values.elementCall -}}
+{{- if .enabled -}}
+{{- with .sfu -}}
 {{- if .enabled -}}
 {{- if $.Capabilities.APIVersions.Has "monitoring.coreos.com/v1/ServiceMonitor" }}
 {{- if .serviceMonitors.enabled }}
@@ -12,7 +14,7 @@ apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
   labels:
-    {{- include "element-io.element-call.sfu.labels" (dict "root" $ "context" .) | nindent 4 }}
+    {{- include "element-io.element-call-sfu.labels" (dict "root" $ "context" .) | nindent 4 }}
   name: {{ $.Release.Name }}-element-call-sfu
   namespace: {{ $.Release.Namespace }}
 spec:
@@ -26,5 +28,7 @@ spec:
       app.kubernetes.io/instance: {{ $.Release.Name }}-element-call-sfu
 {{- end }}
 {{- end }}
+{{- end -}}
+{{- end -}}
 {{- end -}}
 {{- end -}}

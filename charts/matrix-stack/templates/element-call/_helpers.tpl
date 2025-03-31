@@ -4,18 +4,18 @@ Copyright 2024 New Vector Ltd
 SPDX-License-Identifier: AGPL-3.0-only
 */ -}}
 
-{{- define "element-io.element-call.sfu-jwt.labels" -}}
+{{- define "element-io.element-call-sfu-jwt.labels" -}}
 {{- $root := .root -}}
 {{- with required "element-io.element-call.labels missing context" .context -}}
 {{ include "element-io.ess-library.labels.common" (dict "root" $root "context" .labels) }}
-app.kubernetes.io/component: matrix-stack-rtc
-app.kubernetes.io/name: element-call-sfu-jwt
-app.kubernetes.io/instance: {{ $root.Release.Name }}-element-call-sfu-jwt
+app.kubernetes.io/component: matrix-stack-sfu-jwt
+app.kubernetes.io/name: element-call
+app.kubernetes.io/instance: {{ $root.Release.Name }}-element-call
 app.kubernetes.io/version: {{ .image.tag }}
 {{- end }}
 {{- end }}
 
-{{- define "element-io.element-call.sfu.labels" -}}
+{{- define "element-io.element-call-sfu.labels" -}}
 {{- $root := .root -}}
 {{- with required "element-io.element-call.labels missing context" .context -}}
 {{ include "element-io.ess-library.labels.common" (dict "root" $root "context" .labels) }}
@@ -26,7 +26,7 @@ app.kubernetes.io/version: {{ .image.tag }}
 {{- end }}
 {{- end }}
 
-{{- define "element-io.element-call.sfu-jwt.env" }}
+{{- define "element-io.element-call-sfu-jwt.env" }}
 {{- $root := .root -}}
 {{- with required "element-io.sfu-jwt.env missing context" .context -}}
 {{- $resultEnv := dict -}}
@@ -62,7 +62,7 @@ app.kubernetes.io/version: {{ .image.tag }}
 {{- end -}}
 {{- end -}}
 
-{{- define "element-io.element-call.sfu.env" }}
+{{- define "element-io.element-call-sfu.env" }}
 {{- $root := .root -}}
 {{- with required "element-io.sfu-jwt missing context" .context -}}
 {{- $resultEnv := dict -}}

@@ -33,6 +33,7 @@ from typing import Any, Callable, Self
 @dataclass(unsafe_hash=True)
 class DeployableDetails(abc.ABC):
     name: str = field(hash=True)
+    value_file_prefix: str | None = field(default=None, hash=False)
     helm_key: str | None = field(default=None, hash=False)
 
     has_db: bool = field(default=False, hash=False)
@@ -103,6 +104,8 @@ class ComponentDetails(DeployableDetails):
     ):
         super().__post_init__()
 
+        if not self.value_file_prefix:
+            self.value_file_prefix = self.name
         # Shared components don't have a <component>-minimal-values.yaml
         if is_shared_component:
             self.active_component_names = (self.name,)
@@ -113,18 +116,18 @@ class ComponentDetails(DeployableDetails):
         assert self.has_db == ("postgres" in shared_component_names)
 
         self.active_component_names = tuple([self.name] + list(shared_component_names))
-        self.values_files = tuple([f"{self.name}-minimal-values.yaml"] + list(additional_values_files))
+        self.values_files = tuple([f"{self.value_file_prefix}-minimal-values.yaml"] + list(additional_values_files))
 
         secret_values_files = []
         if "init-secrets" in shared_component_names:
             secret_values_files += [
-                f"{self.name}-secrets-in-helm-values.yaml",
-                f"{self.name}-secrets-externally-values.yaml",
+                f"{self.value_file_prefix}-secrets-in-helm-values.yaml",
+                f"{self.value_file_prefix}-secrets-externally-values.yaml",
             ]
         if "postgres" in shared_component_names:
             secret_values_files += [
-                f"{self.name}-postgres-secrets-in-helm-values.yaml",
-                f"{self.name}-postgres-secrets-externally-values.yaml",
+                f"{self.value_file_prefix}-postgres-secrets-in-helm-values.yaml",
+                f"{self.value_file_prefix}-postgres-secrets-externally-values.yaml",
             ]
         self.secret_values_files = tuple(secret_values_files)
 
@@ -173,15 +176,17 @@ all_components_details = [
         is_shared_component=True,
     ),
     ComponentDetails(
-        name="element-call",
+        name="element-call-sfu-jwt",
+        value_file_prefix="element-call",
         helm_key="elementCall",
         sub_components=[
             SubComponentDetails(
-                name="sfu",
+                name="element-call-sfu",
                 helm_key="sfu",
                 has_ingress=False,
             )
-        ]
+        ],
+        shared_component_names=["init-secrets"],
     ),
     ComponentDetails(
         name="element-web",
