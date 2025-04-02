@@ -51,7 +51,7 @@ app.kubernetes.io/version: {{ .image.tag }}
               "defaultSecretKey" "LIVEKIT_SECRET"
               )
         ))) }}
-{{- $_ := set $resultEnv "LIVEKIT_URL" (printf "wss://%s" .ingress.host) -}}
+{{- $_ := set $resultEnv "LIVEKIT_URL" (printf "wss://%s" (tpl .ingress.host $root)) -}}
 {{- range $key, $value := $resultEnv }}
 - name: {{ $key | quote }}
   value: {{ $value | quote }}
@@ -73,9 +73,9 @@ app.kubernetes.io/version: {{ .image.tag }}
 {{- end -}}
 {{- end -}}
 
-{{- define "element-io.element-call-sfu.configSecrets" -}}
+{{- define "element-io.element-call-sfu-jwt.configSecrets" -}}
 {{- $root := .root -}}
-{{- with required "element-io.synapse.configSecrets missing context" .context -}}
+{{- with required "element-io.element-call-sfu-jwt.configSecrets missing context" .context -}}
 {{- $configSecrets := list -}}
 {{- if and $root.Values.initSecrets.enabled (include "element-io.init-secrets.generated-secrets" (dict "root" $root)) }}
 {{ $configSecrets = append $configSecrets (printf "%s-generated" $root.Release.Name) }}

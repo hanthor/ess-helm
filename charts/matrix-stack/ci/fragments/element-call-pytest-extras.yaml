@@ -1,0 +1,20 @@
+# Copyright 2025 New Vector Ltd
+#
+# SPDX-License-Identifier: AGPL-3.0-only
+
+elementCall:
+  ingress:
+    host: call.{{ $.Values.serverName }}
+  image:
+    registry: ghcr.io
+    repository: element-hq/lk-jwt
+    tag: test
+    pullPolicy: Never
+  sfu:
+    extraEnv:
+    - name: DEBUG_RENDERING
+      value: "1"
+    podSecurityContext:
+      runAsGroup: 0
+  podSecurityContext:
+    runAsGroup: 0

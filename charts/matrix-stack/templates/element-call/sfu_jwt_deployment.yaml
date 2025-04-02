@@ -52,34 +52,39 @@ spec:
         securityContext:
           {{- toYaml . | nindent 10 }}
 {{- end }}
-      env:
-        {{- include "element-io.element-call-sfu-jwt.env" (dict "root" $ "context" .) | nindent 8 }}
-      ports:
-      - containerPort: 8080
-        name: http
-        protocol: TCP
-      livenessProbe:
-        httpGet:
-          path: /healthz
-          port: http
-      readinessProbe:
-        httpGet:
-          path: /healthz
-          port: http
-      startupProbe:
-        httpGet:
-          path: /healthz
-          port: http
+        env:
+          {{- include "element-io.element-call-sfu-jwt.env" (dict "root" $ "context" .) | nindent 8 }}
+        ports:
+        - containerPort: 8080
+          name: http
+          protocol: TCP
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: http
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: http
+        startupProbe:
+          httpGet:
+            path: /healthz
+            port: http
 {{- with .resources }}
         resources:
           {{- toYaml . | nindent 10 }}
 {{- end }}
-      volumeMounts:
-      - name: secrets
-        mountPath: /secrets
-    volumes:
-    - name: secrets
-      secret:
-        secretName: "{{ $.Release.Name }}-element-call-sfu-jwt-secrets"
+        volumeMounts:
+{{- range $secret := include "element-io.element-call-sfu-jwt.configSecrets" (dict "root" $ "context" $.Values.elementCall) | fromJsonArray }}
+        - mountPath: /secrets/{{ tpl $secret $ }}
+          name: "secret-{{ tpl $secret $ }}"
+          readOnly: true
+{{- end }}
+      volumes:
+{{- range $secret := include "element-io.element-call-sfu-jwt.configSecrets" (dict "root" $ "context" $.Values.elementCall) | fromJsonArray }}
+      - secret:
+          secretName: {{ tpl $secret $ }}
+        name: secret-{{ tpl $secret $ }}
+{{- end }}
 {{- end }}
 {{- end }}

@@ -450,14 +450,16 @@ elementCall:
     hostNetwork: false
     exposedServices:
       rtcTcp:
+        enabled: true
         # Either a NodePort or a HostPort
         portType: NodePort
         port: 30881
-      rtcUdp:
+      rtcMuxedUdp:
+        enabled: true
         # Either a NodePort or a HostPort
         portType: NodePort
         port: 30882
-      rtcMuxedUdp:
+      rtcUdp:
         enabled: false
         # Either a NodePort or a HostPort
         portType: NodePort
@@ -492,6 +494,12 @@ elementCall:
       ## pullSecrets:
       ## - name: dockerhub
       pullSecrets: []
+    ## Defines additional environment variables to be injected onto this workload
+    ## e.g.
+    ## extraEnv:
+    ## - name: FOO
+    ##   value: "bar"
+    extraEnv: []
     ## Labels to add to all manifest for this component
     labels: {}
     ## Defines the annotations to add to the workload

@@ -2,18 +2,89 @@
 #
 # SPDX-License-Identifier: AGPL-3.0-only
 #
-# source_fragments: element-call-minimal.yaml
+# source_fragments: element-call-minimal.yaml element-call-pytest-extras.yaml synapse-minimal.yaml synapse-pytest-base-extras.yaml synapse-pytest-self-extras.yaml matrix-authentication-service-minimal.yaml matrix-authentication-service-pytest-extras.yaml init-secrets-minimal.yaml init-secrets-pytest-extras.yaml postgres-minimal.yaml
 # DO NOT EDIT DIRECTLY. Edit the fragment files to add / modify / remove values
 
-# initSecrets, postgres don't have any required properties to be set and defaults to enabled
 elementCall:
+  image:
+    pullPolicy: Never
+    registry: ghcr.io
+    repository: element-hq/lk-jwt
+    tag: test
   ingress:
-    host: rtc.ess.localhost
+    host: call.{{ $.Values.serverName }}
+  podSecurityContext:
+    runAsGroup: 0
+  sfu:
+    extraEnv:
+      - name: DEBUG_RENDERING
+        value: "1"
+    podSecurityContext:
+      runAsGroup: 0
 elementWeb:
   enabled: false
+haproxy:
+  podSecurityContext:
+    runAsGroup: 0
+initSecrets:
+  annotations:
+    has-no-service-monitor: "true"
+  podSecurityContext:
+    runAsGroup: 0
 matrixAuthenticationService:
-  enabled: false
+  additional:
+    000-pytest-admin:
+      configSecret: '{{ $.Release.Name }}-pytest-admin'
+      configSecretKey: admin.yaml
+  extraEnv:
+    - name: DEBUG_RENDERING
+      value: "1"
+  ingress:
+    host: mas.{{ $.Values.serverName }}
+    tlsSecret: '{{ $.Release.Name }}-mas-web-tls'
+  podSecurityContext:
+    runAsGroup: 0
+postgres:
+  podSecurityContext:
+    runAsGroup: 0
+serverName: ess.localhost
 synapse:
-  enabled: false
+  additional:
+    00-userconfig.yaml:
+      config: |
+        push:
+          jitter_dalay: 10
+    01-other-user-config.yaml:
+      configSecret: '{{ $.Release.Name }}-synapse-secrets'
+      configSecretKey: 01-other-user-config.yaml
+  checkConfigHook:
+    annotations:
+      has-no-service-monitor: "true"
+  extraArgs:
+    # Validate that any Synapse config that has a <foo>_path equivalent uses it
+    - --no-secrets-in-config
+  extraEnv:
+    - name: DEBUG_RENDERING
+      value: "1"
+  ingress:
+    host: synapse.{{ $.Values.serverName }}
+    tlsSecret: '{{ $.Release.Name }}-synapse-web-tls'
+  podSecurityContext:
+    runAsGroup: 0
+  redis:
+    annotations:
+      has-no-service-monitor: "true"
+    podSecurityContext:
+      runAsGroup: 0
+  workers:
+    # A non-HTTP worker & a stream writer
+    event-persister:
+      enabled: true
+    # Media repo is fairly distinct from other workers
+    media-repository:
+      enabled: true
+    # A standard HTTP worker
+    sliding-sync:
+      enabled: true
 wellKnownDelegation:
   enabled: false

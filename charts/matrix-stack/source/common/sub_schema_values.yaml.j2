@@ -362,6 +362,7 @@ labels: {}
 
 {% macro exposedServicePort(name, port, portType='NodePort') %}
 {{ name }}:
+  enabled: true
   # Either a NodePort or a HostPort
   portType: {{ portType }}
   port: {{ port }}

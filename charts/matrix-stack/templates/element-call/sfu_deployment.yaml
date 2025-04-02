@@ -55,9 +55,10 @@ spec:
           {{- toYaml . | nindent 10 }}
 {{- end }}
         env:
+        {{- (include "element-io.element-call-sfu.env" (dict "root" $ "context" .)) | nindent 8 }}
         - name: "LIVEKIT_KEY"
           value: >-
-            {{ printf "{{ readfile \"/secrets/%s\" | quote }}" (
+            {{ printf "{{ readfile \"/secrets/%s\" }}" (
               include "element-io.ess-library.init-secret-path" (
                   dict "root" $
                   "context" (dict
@@ -67,11 +68,11 @@ spec:
                     "defaultSecretKey" "LIVEKIT_KEY"
                   )
                 )
-              ) }}"
+              )
             }}
         - name: LIVEKIT_SECRET
           value: >-
-           {{ (printf "{{ readfile \"/secrets/%s\" | quote }}" (
+           {{ (printf "{{ readfile \"/secrets/%s\" }}" (
                 (include "element-io.ess-library.init-secret-path" (
                     dict "root" $
                     "context" (dict
@@ -83,7 +84,7 @@ spec:
                     )
                   )
                 )
-              ) }}"
+              )
            }}
         command:
         - "/matrix-tools"
@@ -102,11 +103,12 @@ spec:
         - mountPath: /conf
           name: rendered-config
           readOnly: false
-{{- range $secret := include "element-io.element-call-sfu.configSecrets" (dict "root" $ "context" $.Values.elementCall) | fromJsonArray }}
+{{- range $secret := include "element-io.element-call-sfu-jwt.configSecrets" (dict "root" $ "context" $.Values.elementCall) | fromJsonArray }}
         - mountPath: /secrets/{{ tpl $secret $ }}
           name: "secret-{{ tpl $secret $ }}"
           readOnly: true
 {{- end }}
+      hostNetwork: {{ .hostNetwork }}
       containers:
       - name: sfu
         args:
@@ -129,7 +131,6 @@ spec:
         env:
           {{- . | nindent 10 }}
   {{- end }}
-        hostNetwork: {{ .hostNetwork }}
         ports:
         - containerPort: 6789
           name: metrics
@@ -137,31 +138,43 @@ spec:
         - containerPort: 7880
           name: http
           protocol: TCP
-        - containerPort: {{ .exposedServices.rtcTcp.port }}
-  {{- if eq .exposedServices.rtcTcp.type "HostPort" }}
-          hostPort: {{ .exposedServices.rtcTcp.port }}
-  {{- end }}
+{{- with .exposedServices }}
+  {{- with .rtcTcp }}
+  {{- if .enabled }}
+        - containerPort: {{ .port }}
+    {{- if eq .type "HostPort" }}
+          hostPort: {{ .port }}
+    {{- end }}
           name: rtc-tcp
           protocol: TCP
-        - containerPort: {{ .exposedServices.rtcUdp.port }}
-          name: rtc-udp
-          protocol: UDP
-  {{- if eq .exposedServices.rtcUdp.type "HostPort" }}
-          hostPort: {{ .exposedServices.rtcUdp.port }}
   {{- end }}
-  {{- if .exposedServices.rtcMuxedUdp.enabled }}
-  {{- $portType := .type -}}
-  {{- with .exposedServices.rtcMuxedUdp.portRange }}
-  {{- range $port := seq .startPort .endPort  }}
+  {{- end }}
+  {{- with .rtcMuxedUdp }}
+  {{- if .enabled }}
+        - containerPort: {{ .port }}
+    {{- if eq .type "HostPort" }}
+          hostPort: {{ .port }}
+    {{- end }}
+          name: rtc-muxed-udp
+          protocol: TCP
+  {{- end }}
+  {{- end }}
+  {{- with .rtcUdp }}
+  {{- if .enabled }}
+    {{- $portType := .type -}}
+    {{- with .portRange }}
+    {{- range $port := seq .startPort .endPort  }}
           - containerPort: {{ $port }}
             name: rtc-udp-{{ $port }}
             protocol: UDP
-  {{ if eq .type "HostPort" }}
+      {{ if eq .type "HostPort" }}
             hostPort: {{ $port }}
+      {{- end }}
+    {{- end }}
+    {{- end }}
   {{- end }}
   {{- end }}
-  {{- end }}
-  {{- end }}
+{{- end }}
         livenessProbe:
           httpGet:
             path: /
@@ -186,7 +199,7 @@ spec:
           name: plain-config
           subPath: config.yaml
       volumes:
-{{- range $secret := include "element-io.element-call-sfu.configSecrets" (dict "root" $ "context" $.Values.elementCall) | fromJsonArray }}
+{{- range $secret := include "element-io.element-call-sfu-jwt.configSecrets" (dict "root" $ "context" $.Values.elementCall) | fromJsonArray }}
       - secret:
           secretName: {{ tpl $secret $ }}
         name: secret-{{ tpl $secret $ }}

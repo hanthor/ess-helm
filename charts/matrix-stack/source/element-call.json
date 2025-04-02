@@ -63,6 +63,9 @@
         "labels": {
           "$ref": "file://common/labels.json"
         },
+        "extraEnv": {
+          "$ref": "file://common/extraEnv.json"
+        },
         "annotations": {
           "$ref": "file://common/workloadAnnotations.json"
         },
@@ -110,10 +113,10 @@
             "rtcTcp": {
               "$ref": "file://common/exposedServicePort.json"
             },
-            "rtcUdp": {
+            "rtcMuxedUdp": {
               "$ref": "file://common/exposedServicePort.json"
             },
-            "rtcMuxedUdp": {
+            "rtcUdp": {
               "$ref": "file://common/exposedServicePortRange.json"
             }
           }

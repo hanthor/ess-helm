@@ -10,11 +10,23 @@ SPDX-License-Identifier: AGPL-3.0-only
 port: 7880
 # WebRTC configuration
 rtc:
-  tcp_port: {{ .exposedServices.rtcTcp.port }}
-  udp_port: {{ .exposedServices.rtcUdp.port }}
-{{ if .exposedServices.rtcMuxedUdp.enabled }}
-  port_range_start: {{ .exposedServices.rtcMuxedUdp.portRange.startPort }}
-  port_range_end: {{ .exposedServices.rtcMuxedUdp.portRange.endPort }}
+{{- with .exposedServices }}
+{{- with .rtcTcp }}
+{{- if .enabled }}
+  tcp_port: {{ .port }}
+{{- end }}
+{{- end }}
+{{- with .rtcMuxedUdp }}
+{{- if .enabled }}
+  udp_port: {{ .port }}
+{{- end }}
+{{- end }}
+{{- with .rtcUdp }}
+{{- if .enabled }}
+  port_range_start: {{ .portRange.startPort }}
+  port_range_end: {{ .portRange.endPort }}
+{{- end }}
+{{- end }}
 {{ end }}
 {{ if .useExternalIp }}
   use_external_ip: true
@@ -34,7 +46,7 @@ rtc:
 
 prometheus_port: 6789
 
-key_file: keys.yaml
+key_file: /conf/keys.yaml
 
 # Logging config
 logging:
