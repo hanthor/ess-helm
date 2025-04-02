@@ -20,7 +20,6 @@ spec:
   - host: {{ (tpl .ingress.host $) | quote }}
     http:
       paths:
-      paths:
       - path: /sfu/get
         pathType: Prefix
         backend:
