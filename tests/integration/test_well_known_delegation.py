@@ -23,8 +23,8 @@ async def test_well_known_files_can_be_accessed(
         assert "m.homeserver" in json_content
     if value_file_has("elementCall.enabled"):
         assert json_content["org.matrix.msc4143.rtc_foci"] == [
-                {"type": "livekit", "livekit_service_url": f"https://call.{generated_data.server_name}"}
-            ]
+            {"type": "livekit", "livekit_service_url": f"https://call.{generated_data.server_name}"}
+        ]
 
     json_content = await aiottp_get_json(f"https://{generated_data.server_name}/.well-known/matrix/server", ssl_context)
     if value_file_has("synapse.enabled", True):
