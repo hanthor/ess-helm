@@ -46,7 +46,7 @@ rtc:
 
 prometheus_port: 6789
 
-key_file: /conf/keys.yaml
+key_file: /rendered-config/keys.yaml
 
 # Logging config
 logging:

@@ -192,9 +192,8 @@ spec:
           {{- toYaml . | nindent 10 }}
 {{- end }}
         volumeMounts:
-        - mountPath: /conf/keys.yaml
+        - mountPath: /rendered-config
           name: rendered-config
-          subPath: keys.yaml
         - mountPath: /conf/config.yaml
           name: plain-config
           subPath: config.yaml
