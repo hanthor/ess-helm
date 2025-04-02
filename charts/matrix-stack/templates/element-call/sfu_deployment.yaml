@@ -54,6 +54,37 @@ spec:
         securityContext:
           {{- toYaml . | nindent 10 }}
 {{- end }}
+        env:
+        - name: "LIVEKIT_KEY"
+          value: >-
+            {{ printf "{{ readfile \"/secrets/%s\" | quote }}" (
+              include "element-io.ess-library.init-secret-path" (
+                  dict "root" $
+                  "context" (dict
+                    "secretPath" "elementCall.livekitKey"
+                    "initSecretKey" "ELEMENT_CALL_LIVEKIT_KEY"
+                    "defaultSecretName" (printf "%s-element-call-sfu-jwt" $.Release.Name)
+                    "defaultSecretKey" "LIVEKIT_KEY"
+                  )
+                )
+              ) }}"
+            }}
+        - name: LIVEKIT_SECRET
+          value: >-
+           {{ (printf "{{ readfile \"/secrets/%s\" | quote }}" (
+                (include "element-io.ess-library.init-secret-path" (
+                    dict "root" $
+                    "context" (dict
+                      "secretPath" "elementCall.livekitSecret"
+                      "initSecretKey" "ELEMENT_CALL_LIVEKIT_SECRET"
+                      "defaultSecretName" (printf "%s-element-call-sfu-jwt" $.Release.Name)
+                      "defaultSecretKey" "LIVEKIT_SECRET"
+                      )
+                    )
+                  )
+                )
+              ) }}"
+           }}
         command:
         - "/matrix-tools"
         - render-config
@@ -71,9 +102,11 @@ spec:
         - mountPath: /conf
           name: rendered-config
           readOnly: false
-        - mountPath: /secrets
-          name: secrets
+{{- range $secret := include "element-io.element-call-sfu.configSecrets" (dict "root" $ "context" $.Values.elementCall) | fromJsonArray }}
+        - mountPath: /secrets/{{ tpl $secret $ }}
+          name: "secret-{{ tpl $secret $ }}"
           readOnly: true
+{{- end }}
       containers:
       - name: sfu
         args:
@@ -153,10 +186,11 @@ spec:
           name: plain-config
           subPath: config.yaml
       volumes:
+{{- range $secret := include "element-io.element-call-sfu.configSecrets" (dict "root" $ "context" $.Values.elementCall) | fromJsonArray }}
       - secret:
-          secretName: "{{ $.Release.Name }}-element-call-sfu-jwt"
-          defaultMode: 384
-        name: secrets
+          secretName: {{ tpl $secret $ }}
+        name: secret-{{ tpl $secret $ }}
+{{- end }}
       - configMap:
           name: "{{ $.Release.Name }}-element-call-sfu"
           defaultMode: 420

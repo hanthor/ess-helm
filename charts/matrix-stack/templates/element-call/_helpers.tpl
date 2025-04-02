@@ -33,28 +33,25 @@ app.kubernetes.io/version: {{ .image.tag }}
 {{- range $envEntry := .extraEnv -}}
 {{- $_ := set $resultEnv $envEntry.name $envEntry.value -}}
 {{- end -}}
-- name: LIVEKIT_KEY_PATH
-  value: /secrets/{{
-  include "element-io.ess-library.init-secret-path" (
-    dict "root" $root "context" (
-      dict "secretPath" "elementCall.livekitKey"
-           "initSecretKey" "ELEMENT_CALL_LIVEKIT_KEY"
-           "defaultSecretName" (printf "%s-element-call-sfu-jwt" $root.Release.Name)
-           "defaultSecretKey" "LIVEKIT_KEY"
-      )
-    ) }}
-- name: LIVEKIT_SECRET_PATH
-  value: /secrets/{{
-  include "element-io.ess-library.init-secret-path" (
-    dict "root" $root "context" (
-      dict "secretPath" "elementCall.livekitSecret"
-           "initSecretKey" "ELEMENT_CALL_LIVEKIT_SECRET"
-           "defaultSecretName" (printf "%s-element-call-sfu-jwt" $root.Release.Name)
-           "defaultSecretKey" "LIVEKIT_SECRET"
-      )
-    ) }}
-- name: LIVEKIT_URL
-  value: "wss://{{ .ingress.host }}"
+{{- $_ := set $resultEnv "LIVEKIT_KEY_PATH" (printf "/secrets/%s"
+      (include "element-io.ess-library.init-secret-path" (
+        dict "root" $root "context" (
+          dict "secretPath" "elementCall.livekitKey"
+              "initSecretKey" "ELEMENT_CALL_LIVEKIT_KEY"
+              "defaultSecretName" (printf "%s-element-call-sfu-jwt" $root.Release.Name)
+              "defaultSecretKey" "LIVEKIT_KEY"
+          )
+      ))) }}
+{{- $_ := set $resultEnv "LIVEKIT_SECRET_PATH" (printf "/secrets/%s"
+      (include "element-io.ess-library.init-secret-path" (
+        dict "root" $root "context" (
+          dict "secretPath" "elementCall.livekitSecret"
+              "initSecretKey" "ELEMENT_CALL_LIVEKIT_SECRET"
+              "defaultSecretName" (printf "%s-element-call-sfu-jwt" $root.Release.Name)
+              "defaultSecretKey" "LIVEKIT_SECRET"
+              )
+        ))) }}
+{{- $_ := set $resultEnv "LIVEKIT_URL" (printf "wss://%s" .ingress.host) -}}
 {{- range $key, $value := $resultEnv }}
 - name: {{ $key | quote }}
   value: {{ $value | quote }}
@@ -69,5 +66,29 @@ app.kubernetes.io/version: {{ .image.tag }}
 {{- range $envEntry := .extraEnv -}}
 {{- $_ := set $resultEnv $envEntry.name $envEntry.value -}}
 {{- end -}}
+{{- range $key, $value := $resultEnv }}
+- name: {{ $key | quote }}
+  value: {{ $value | quote }}
 {{- end -}}
 {{- end -}}
+{{- end -}}
+
+{{- define "element-io.element-call-sfu.configSecrets" -}}
+{{- $root := .root -}}
+{{- with required "element-io.synapse.configSecrets missing context" .context -}}
+{{- $configSecrets := list -}}
+{{- if and $root.Values.initSecrets.enabled (include "element-io.init-secrets.generated-secrets" (dict "root" $root)) }}
+{{ $configSecrets = append $configSecrets (printf "%s-generated" $root.Release.Name) }}
+{{- end }}
+{{- if or .livekitKey.value .livekitSecret.value -}}
+{{ $configSecrets = append $configSecrets (printf "%s-element-call-sfu-jwt" $root.Release.Name) }}
+{{- end -}}
+{{- with .livekitKey.secret -}}
+{{ $configSecrets = append $configSecrets (tpl . $root) }}
+{{- end -}}
+{{- with .livekitSecret.secret -}}
+{{ $configSecrets = append $configSecrets (tpl . $root) }}
+{{- end -}}
+{{ $configSecrets | uniq | toJson }}
+{{- end }}
+{{- end }}
