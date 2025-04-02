@@ -44,6 +44,17 @@ async def helm_prerequisites(
             ),
         )
 
+    if value_file_has("elementCall.enabled", True):
+        resources.append(
+            kubernetes_tls_secret(
+                f"{generated_data.release_name}-element-call-tls",
+                generated_data.ess_namespace,
+                ca,
+                [f"call.{generated_data.server_name}"],
+                bundled=True,
+            )
+        )
+
     if value_file_has("elementWeb.enabled", True):
         resources.append(
             kubernetes_tls_secret(
@@ -147,6 +158,11 @@ async def matrix_stack(
         ]
     values["matrixTools"].setdefault("image", {})
     values["matrixTools"]["image"] = loaded_matrix_tools
+    values["elementCall"]["hostAliases"] = [{
+        "ip": ingress,
+        "hostnames": [f"{generated_data.server_name}",
+                      f"synapse.{generated_data.server_name}"],
+    }]
 
     chart = await helm_client.get_chart("charts/matrix-stack")
     # Install or upgrade a release
