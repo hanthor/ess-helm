@@ -5,11 +5,7 @@
 elementCall:
   ingress:
     host: call.{{ $.Values.serverName }}
-  image:
-    registry: ghcr.io
-    repository: element-hq/lk-jwt
-    tag: test
-    pullPolicy: Never
+    tlsSecret: "{{ $.Release.Name }}-element-call-tls"
   sfu:
     extraEnv:
     - name: DEBUG_RENDERING

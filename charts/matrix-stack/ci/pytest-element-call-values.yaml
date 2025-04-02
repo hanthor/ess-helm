@@ -6,13 +6,9 @@
 # DO NOT EDIT DIRECTLY. Edit the fragment files to add / modify / remove values
 
 elementCall:
-  image:
-    pullPolicy: Never
-    registry: ghcr.io
-    repository: element-hq/lk-jwt
-    tag: test
   ingress:
     host: call.{{ $.Values.serverName }}
+    tlsSecret: '{{ $.Release.Name }}-element-call-tls'
   podSecurityContext:
     runAsGroup: 0
   sfu:

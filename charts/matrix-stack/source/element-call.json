@@ -24,6 +24,9 @@
     "labels": {
       "$ref": "file://common/labels.json"
     },
+    "hostAliases": {
+      "$ref": "file://common/hostAliases.json"
+    },
     "annotations": {
       "$ref": "file://common/workloadAnnotations.json"
     },
