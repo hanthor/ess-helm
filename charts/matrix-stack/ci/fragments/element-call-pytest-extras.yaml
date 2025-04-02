@@ -6,6 +6,9 @@ elementCall:
   ingress:
     host: call.{{ $.Values.serverName }}
     tlsSecret: "{{ $.Release.Name }}-element-call-tls"
+  extraEnv:
+  - name: LIVEKIT_INSECURE_SKIP_VERIFY_TLS
+    value: "YES_I_KNOW_WHAT_I_AM_DOING"
   sfu:
     extraEnv:
     - name: DEBUG_RENDERING

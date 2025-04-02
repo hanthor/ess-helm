@@ -2,10 +2,13 @@
 #
 # SPDX-License-Identifier: AGPL-3.0-only
 #
-# source_fragments: element-call-minimal.yaml element-call-pytest-extras.yaml synapse-minimal.yaml synapse-pytest-base-extras.yaml synapse-pytest-self-extras.yaml matrix-authentication-service-minimal.yaml matrix-authentication-service-pytest-extras.yaml init-secrets-minimal.yaml init-secrets-pytest-extras.yaml postgres-minimal.yaml
+# source_fragments: element-call-minimal.yaml element-call-pytest-extras.yaml synapse-minimal.yaml synapse-pytest-base-extras.yaml synapse-pytest-self-extras.yaml matrix-authentication-service-minimal.yaml matrix-authentication-service-pytest-extras.yaml init-secrets-minimal.yaml init-secrets-pytest-extras.yaml postgres-minimal.yaml well-known-minimal.yaml well-known-pytest-extras.yaml
 # DO NOT EDIT DIRECTLY. Edit the fragment files to add / modify / remove values
 
 elementCall:
+  extraEnv:
+    - name: LIVEKIT_INSECURE_SKIP_VERIFY_TLS
+      value: YES_I_KNOW_WHAT_I_AM_DOING
   ingress:
     host: call.{{ $.Values.serverName }}
     tlsSecret: '{{ $.Release.Name }}-element-call-tls'
@@ -19,9 +22,13 @@ elementCall:
       runAsGroup: 0
 elementWeb:
   enabled: false
+global:
+  baseDomain: ess.localhost
 haproxy:
   podSecurityContext:
     runAsGroup: 0
+ingress:
+  controllerType: ingress-nginx
 initSecrets:
   annotations:
     has-no-service-monitor: "true"
@@ -43,7 +50,8 @@ matrixAuthenticationService:
 postgres:
   podSecurityContext:
     runAsGroup: 0
-serverName: ess.localhost
+# To check that templating works against the ingress
+serverName: '{{ $.Values.global.baseDomain }}'
 synapse:
   additional:
     00-userconfig.yaml:
@@ -83,4 +91,7 @@ synapse:
     sliding-sync:
       enabled: true
 wellKnownDelegation:
-  enabled: false
+  baseDomainRedirect:
+    url: https://redirect.localhost/path
+  ingress:
+    tlsSecret: '{{ $.Release.Name }}-well-known-web-tls'

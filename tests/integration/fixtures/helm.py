@@ -158,11 +158,13 @@ async def matrix_stack(
         ]
     values["matrixTools"].setdefault("image", {})
     values["matrixTools"]["image"] = loaded_matrix_tools
-    values["elementCall"]["hostAliases"] = [{
-        "ip": ingress,
-        "hostnames": [f"{generated_data.server_name}",
-                      f"synapse.{generated_data.server_name}"],
-    }]
+    values["elementCall"]["hostAliases"] = [
+        {
+            "ip": ingress,
+            "hostnames": [generated_data.server_name, f"synapse.{generated_data.server_name}"],
+        }
+    ]
+    values["synapse"]["hostAliases"] = values["elementCall"]["hostAliases"]
 
     chart = await helm_client.get_chart("charts/matrix-stack")
     # Install or upgrade a release

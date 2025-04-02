@@ -13,7 +13,7 @@ enabled: true
 {{- sub_schema_values.ingress() -}}
 {{- sub_schema_values.extraEnv() }}
 
-{{- sub_schema_values.image(registry='ghcr.io', repository='element-hq/lk-jwt-service', tag='v0.2.2') }}
+{{- sub_schema_values.image(registry='ghcr.io', repository='element-hq/lk-jwt-service', tag='0.2.2') }}
 {{- sub_schema_values.labels() }}
 {{- sub_schema_values.workloadAnnotations() }}
 {{- sub_schema_values.containersSecurityContext() }}

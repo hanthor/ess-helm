@@ -117,6 +117,7 @@ async def ingress(cluster, kube_client, helm_client: pyhelm3.Client):
     )
     return (await kube_client.get(Service, name="ingress-nginx-controller", namespace="ingress-nginx")).spec.clusterIP
 
+
 @pytest.fixture(autouse=True, scope="session")
 async def registry(cluster):
     pytest_registry_container_name = "pytest-ess-helm-registry"
