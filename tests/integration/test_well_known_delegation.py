@@ -2,11 +2,10 @@
 #
 # SPDX-License-Identifier: AGPL-3.0-only
 
-import aiohttp
 import pytest
 
 from .fixtures import ESSData
-from .lib.utils import aiottp_get_json, value_file_has
+from .lib.utils import aiohttp_client, aiottp_get_json, value_file_has
 
 
 @pytest.mark.skipif(value_file_has("wellKnownDelegation.enabled", False), reason="WellKnownDelegation not deployed")
@@ -53,8 +52,8 @@ async def test_root_url_redirects(
     await ingress_ready("well-known")
 
     async with (
-        aiohttp.ClientSession(connector=aiohttp.TCPConnector(ssl=ssl_context)) as session,
-        session.get(
+        aiohttp_client(ssl_context) as client,
+        client.get(
             "https://127.0.0.1",
             headers={"Host": generated_data.server_name},
             server_hostname=generated_data.server_name,

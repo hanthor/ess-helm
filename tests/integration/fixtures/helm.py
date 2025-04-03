@@ -14,7 +14,7 @@ from lightkube.models.meta_v1 import ObjectMeta
 from lightkube.resources.core_v1 import Namespace, Secret, Service
 from lightkube.resources.networking_v1 import Ingress
 
-from ..lib.helpers import kubernetes_docker_secret, kubernetes_tls_secret
+from ..lib.helpers import kubernetes_docker_secret, kubernetes_tls_secret, wait_for_endpoint_ready
 from ..lib.utils import DockerAuth, docker_config_json, value_file_has
 from .data import ESSData
 
@@ -161,7 +161,11 @@ async def matrix_stack(
     values["elementCall"]["hostAliases"] = [
         {
             "ip": ingress,
-            "hostnames": [generated_data.server_name, f"synapse.{generated_data.server_name}"],
+            "hostnames": [
+                generated_data.server_name,
+                f"synapse.{generated_data.server_name}",
+                f"mas.{generated_data.server_name}",
+            ],
         }
     ]
     values["synapse"]["hostAliases"] = values["elementCall"]["hostAliases"]
@@ -196,12 +200,7 @@ def ingress_ready(cluster, kube_client: AsyncClient, matrix_stack, generated_dat
                 service = await kube_client.get(
                     Service, path.backend.service.name, namespace=generated_data.ess_namespace
                 )
-                await asyncio.to_thread(
-                    cluster.wait,
-                    name=f"endpoints/{service.metadata.name}",
-                    namespace=generated_data.ess_namespace,
-                    waitfor="jsonpath='{.subsets[].addresses}'",
-                )
+                await wait_for_endpoint_ready(service.metadata.name, generated_data.ess_namespace, cluster, kube_client)
 
     return _ingress_ready
 
