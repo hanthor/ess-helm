@@ -8,9 +8,7 @@ import mimetypes
 from pathlib import Path
 from ssl import SSLContext
 
-import aiohttp
-
-from .utils import KubeCtl, aiohttp_post_json, aiottp_get_json, aiohttp_client
+from .utils import KubeCtl, aiohttp_client, aiohttp_post_json, aiottp_get_json
 
 
 async def get_nonce(synapse_fqdn: str, ssl_context) -> str:
