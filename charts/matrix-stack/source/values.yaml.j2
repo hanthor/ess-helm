@@ -13,9 +13,9 @@ initSecrets:
   {% macro initSecrestValues() %}{% include 'init-secrets.yaml.j2'%}{% endmacro %}
   {{- initSecrestValues() | trim | indent(2) }}
 
-elementCall:
-  {% macro elementCallValues() %}{% include 'element-call.yaml.j2'%}{% endmacro %}
-  {{- elementCallValues() | trim | indent(2) }}
+matrixRTC:
+  {% macro matrixRTCValues() %}{% include 'matrix-rtc.yaml.j2'%}{% endmacro %}
+  {{- matrixRTCValues() | trim | indent(2) }}
 
 elementWeb:
   {% macro elementWebValues() %}{% include 'element-web.yaml.j2'%}{% endmacro %}

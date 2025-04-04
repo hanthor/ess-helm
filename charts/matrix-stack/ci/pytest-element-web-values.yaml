@@ -6,8 +6,6 @@
 # DO NOT EDIT DIRECTLY. Edit the fragment files to add / modify / remove values
 
 # initSecrets, postgres don't have any required properties to be set and defaults to enabled
-elementCall:
-  enabled: false
 elementWeb:
   additional:
     user-config.json: |
@@ -18,7 +16,7 @@ elementWeb:
           }
         },
         "element_call": {
-          "url": "https://call.{{ $.Values.serverName }}",
+          "url": "https://mrtc.{{ $.Values.serverName }}",
           "use_exclusively": true
         },
         "features": {
@@ -37,6 +35,8 @@ elementWeb:
     runAsGroup: 0
   replicas: 1
 matrixAuthenticationService:
+  enabled: false
+matrixRTC:
   enabled: false
 serverName: ess.localhost
 synapse:

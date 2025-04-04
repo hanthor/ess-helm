@@ -6,12 +6,12 @@
 # DO NOT EDIT DIRECTLY. Edit the fragment files to add / modify / remove values
 
 # initSecrets, postgres, wellKnownDelegation don't have any required properties to be set and defaults to enabled
-elementCall:
-  enabled: false
 elementWeb:
   ingress:
     host: element.ess.localhost
 matrixAuthenticationService:
+  enabled: false
+matrixRTC:
   enabled: false
 serverName: ess.localhost
 synapse:

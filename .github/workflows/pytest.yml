@@ -28,9 +28,9 @@ jobs:
       fail-fast: false
       matrix:
         test-component:
-        - element-call
         - element-web
         - matrix-authentication-service
+        - matrix-rtc
         - synapse
         - well-known-delegation
     steps:

@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: AGPL-3.0-only
 
-elementCall:
+matrixRTC:
   enabled: true
   ingress:
-    host: rtc.ess.localhost
+    host: mrtc.ess.localhost

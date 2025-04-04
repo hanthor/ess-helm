@@ -4,40 +4,40 @@ Copyright 2024 New Vector Ltd
 SPDX-License-Identifier: AGPL-3.0-only
 */ -}}
 
-{{- define "element-io.element-call-sfu-jwt.labels" -}}
+{{- define "element-io.matrix-rtc-sfu-jwt.labels" -}}
 {{- $root := .root -}}
-{{- with required "element-io.element-call.labels missing context" .context -}}
+{{- with required "element-io.matrix-rtc.labels missing context" .context -}}
 {{ include "element-io.ess-library.labels.common" (dict "root" $root "context" .labels) }}
 app.kubernetes.io/component: matrix-stack-sfu-jwt
-app.kubernetes.io/name: element-call-sfu-jwt
-app.kubernetes.io/instance: {{ $root.Release.Name }}-element-call-sfu-jwt
+app.kubernetes.io/name: matrix-rtc-sfu-jwt
+app.kubernetes.io/instance: {{ $root.Release.Name }}-matrix-rtc-sfu-jwt
 app.kubernetes.io/version: {{ .image.tag }}
 {{- end }}
 {{- end }}
 
-{{- define "element-io.element-call-sfu.labels" -}}
+{{- define "element-io.matrix-rtc-sfu.labels" -}}
 {{- $root := .root -}}
-{{- with required "element-io.element-call.labels missing context" .context -}}
+{{- with required "element-io.matrix-rtc.labels missing context" .context -}}
 {{ include "element-io.ess-library.labels.common" (dict "root" $root "context" .labels) }}
 app.kubernetes.io/component: matrix-stack-rtc
-app.kubernetes.io/name: element-call-sfu
-app.kubernetes.io/instance: {{ $root.Release.Name }}-element-call-sfu
+app.kubernetes.io/name: matrix-rtc-sfu
+app.kubernetes.io/instance: {{ $root.Release.Name }}-matrix-rtc-sfu
 app.kubernetes.io/version: {{ .image.tag }}
 {{- end }}
 {{- end }}
 
-{{- define "element-io.element-call-sfu-rtc.labels" -}}
+{{- define "element-io.matrix-rtc-sfu-rtc.labels" -}}
 {{- $root := .root -}}
-{{- with required "element-io.element-call.labels missing context" .context -}}
+{{- with required "element-io.matrix-rtc.labels missing context" .context -}}
 {{ include "element-io.ess-library.labels.common" (dict "root" $root "context" .labels) }}
 app.kubernetes.io/component: matrix-stack-rtc
-app.kubernetes.io/name: element-call-sfu-rtc
-app.kubernetes.io/instance: {{ $root.Release.Name }}-element-call-sfu-rtc
+app.kubernetes.io/name: matrix-rtc-sfu-rtc
+app.kubernetes.io/instance: {{ $root.Release.Name }}-matrix-rtc-sfu-rtc
 app.kubernetes.io/version: {{ .image.tag }}
 {{- end }}
 {{- end }}
 
-{{- define "element-io.element-call-sfu-jwt.env" }}
+{{- define "element-io.matrix-rtc-sfu-jwt.env" }}
 {{- $root := .root -}}
 {{- with required "element-io.sfu-jwt.env missing context" .context -}}
 {{- $resultEnv := dict -}}
@@ -47,18 +47,18 @@ app.kubernetes.io/version: {{ .image.tag }}
 {{- $_ := set $resultEnv "LIVEKIT_KEY_FROM_FILE" (printf "/secrets/%s"
       (include "element-io.ess-library.init-secret-path" (
         dict "root" $root "context" (
-          dict "secretPath" "elementCall.livekitKey"
+          dict "secretPath" "matrixRTC.livekitKey"
               "initSecretKey" "ELEMENT_CALL_LIVEKIT_KEY"
-              "defaultSecretName" (printf "%s-element-call-sfu-jwt" $root.Release.Name)
+              "defaultSecretName" (printf "%s-matrix-rtc-sfu-jwt" $root.Release.Name)
               "defaultSecretKey" "LIVEKIT_KEY"
           )
       ))) }}
 {{- $_ := set $resultEnv "LIVEKIT_SECRET_FROM_FILE" (printf "/secrets/%s"
       (include "element-io.ess-library.init-secret-path" (
         dict "root" $root "context" (
-          dict "secretPath" "elementCall.livekitSecret"
+          dict "secretPath" "matrixRTC.livekitSecret"
               "initSecretKey" "ELEMENT_CALL_LIVEKIT_SECRET"
-              "defaultSecretName" (printf "%s-element-call-sfu-jwt" $root.Release.Name)
+              "defaultSecretName" (printf "%s-matrix-rtc-sfu-jwt" $root.Release.Name)
               "defaultSecretKey" "LIVEKIT_SECRET"
               )
         ))) }}
@@ -70,7 +70,7 @@ app.kubernetes.io/version: {{ .image.tag }}
 {{- end -}}
 {{- end -}}
 
-{{- define "element-io.element-call-sfu.env" }}
+{{- define "element-io.matrix-rtc-sfu.env" }}
 {{- $root := .root -}}
 {{- with required "element-io.sfu-jwt missing context" .context -}}
 {{- $resultEnv := dict -}}
@@ -84,15 +84,15 @@ app.kubernetes.io/version: {{ .image.tag }}
 {{- end -}}
 {{- end -}}
 
-{{- define "element-io.element-call-sfu-jwt.configSecrets" -}}
+{{- define "element-io.matrix-rtc-sfu-jwt.configSecrets" -}}
 {{- $root := .root -}}
-{{- with required "element-io.element-call-sfu-jwt.configSecrets missing context" .context -}}
+{{- with required "element-io.matrix-rtc-sfu-jwt.configSecrets missing context" .context -}}
 {{- $configSecrets := list -}}
 {{- if and $root.Values.initSecrets.enabled (include "element-io.init-secrets.generated-secrets" (dict "root" $root)) }}
 {{ $configSecrets = append $configSecrets (printf "%s-generated" $root.Release.Name) }}
 {{- end }}
 {{- if or .livekitKey.value .livekitSecret.value -}}
-{{ $configSecrets = append $configSecrets (printf "%s-element-call-sfu-jwt" $root.Release.Name) }}
+{{ $configSecrets = append $configSecrets (printf "%s-matrix-rtc-sfu-jwt" $root.Release.Name) }}
 {{- end -}}
 {{- with .livekitKey.secret -}}
 {{ $configSecrets = append $configSecrets (tpl . $root) }}

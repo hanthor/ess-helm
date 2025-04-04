@@ -44,13 +44,13 @@ async def helm_prerequisites(
             ),
         )
 
-    if value_file_has("elementCall.enabled", True):
+    if value_file_has("matrixRTC.enabled", True):
         resources.append(
             kubernetes_tls_secret(
-                f"{generated_data.release_name}-element-call-tls",
+                f"{generated_data.release_name}-matrix-rtc-tls",
                 generated_data.ess_namespace,
                 ca,
-                [f"call.{generated_data.server_name}"],
+                [f"mrtc.{generated_data.server_name}"],
                 bundled=True,
             )
         )
@@ -158,7 +158,7 @@ async def matrix_stack(
         ]
     values["matrixTools"].setdefault("image", {})
     values["matrixTools"]["image"] = loaded_matrix_tools
-    values["elementCall"]["hostAliases"] = [
+    values["matrixRTC"]["hostAliases"] = [
         {
             "ip": ingress,
             "hostnames": [
@@ -168,7 +168,7 @@ async def matrix_stack(
             ],
         }
     ]
-    values["synapse"]["hostAliases"] = values["elementCall"]["hostAliases"]
+    values["synapse"]["hostAliases"] = values["matrixRTC"]["hostAliases"]
 
     chart = await helm_client.get_chart("charts/matrix-stack")
     # Install or upgrade a release

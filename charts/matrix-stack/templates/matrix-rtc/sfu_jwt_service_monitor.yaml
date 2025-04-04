@@ -4,7 +4,7 @@ Copyright 2024 New Vector Ltd
 SPDX-License-Identifier: AGPL-3.0-only
 */ -}}
 
-{{- with $.Values.elementCall -}}
+{{- with $.Values.matrixRTC -}}
 {{- if .enabled -}}
 {{- if $.Capabilities.APIVersions.Has "monitoring.coreos.com/v1/ServiceMonitor" }}
 {{- if .serviceMonitors.enabled }}
@@ -12,8 +12,8 @@ apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
   labels:
-    {{- include "element-io.element-call-sfu-jwt.labels" (dict "root" $ "context" .) | nindent 4 }}
-  name: {{ $.Release.Name }}-element-call-sfu-jwt
+    {{- include "element-io.matrix-rtc-sfu-jwt.labels" (dict "root" $ "context" .) | nindent 4 }}
+  name: {{ $.Release.Name }}-matrix-rtc-sfu-jwt
   namespace: {{ $.Release.Namespace }}
 spec:
   endpoints:
@@ -23,7 +23,7 @@ spec:
     matchLabels:
       app.kubernetes.io/part-of: matrix-stack
       app.kubernetes.io/component: matrix-stack-sfu-jwt
-      app.kubernetes.io/instance: {{ $.Release.Name }}-element-call-sfu-jwt
+      app.kubernetes.io/instance: {{ $.Release.Name }}-matrix-rtc-sfu-jwt
 {{- end }}
 {{- end }}
 {{- end -}}

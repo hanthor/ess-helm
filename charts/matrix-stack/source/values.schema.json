@@ -54,8 +54,8 @@
     "initSecrets": {
       "$ref": "file://init-secrets.json"
     },
-    "elementCall": {
-      "$ref": "file://element-call.json"
+    "matrixRTC": {
+      "$ref": "file://matrix-rtc.json"
     },
     "elementWeb": {
       "$ref": "file://element-web.json"

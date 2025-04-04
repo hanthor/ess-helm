@@ -6,8 +6,6 @@
 # DO NOT EDIT DIRECTLY. Edit the fragment files to add / modify / remove values
 
 # initSecrets, postgres don't have any required properties to be set and defaults to enabled
-elementCall:
-  enabled: false
 elementWeb:
   enabled: false
 matrixAuthenticationService:
@@ -24,6 +22,8 @@ matrixAuthenticationService:
           endpoint: https://syn.external.localhost
   ingress:
     host: mas.ess.localhost
+matrixRTC:
+  enabled: false
 synapse:
   enabled: false
 wellKnownDelegation:

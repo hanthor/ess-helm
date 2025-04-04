@@ -6,8 +6,6 @@
 # DO NOT EDIT DIRECTLY. Edit the fragment files to add / modify / remove values
 
 # initSecrets, postgres don't have any required properties to be set and defaults to enabled
-elementCall:
-  enabled: false
 elementWeb:
   enabled: false
 global:
@@ -18,6 +16,8 @@ haproxy:
 ingress:
   controllerType: ingress-nginx
 matrixAuthenticationService:
+  enabled: false
+matrixRTC:
   enabled: false
 # To check that templating works against the ingress
 serverName: '{{ $.Values.global.baseDomain }}'

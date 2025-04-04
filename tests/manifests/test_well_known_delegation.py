@@ -32,7 +32,7 @@ async def assert_well_known_files(
         expected_client = {}
     expected_client = expected_client | {
         "org.matrix.msc4143.rtc_foci": [
-            {"type": "livekit", "livekit_service_url": "https://livekit-jwt.call.element.io"}
+            {"type": "livekit", "livekit_service_url": "https://livekit-jwt.mrtc.element.io"}
         ]
     }
     client_config = {"testclientkey": {"testsubket": "testvalue"}}

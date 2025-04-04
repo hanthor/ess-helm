@@ -177,11 +177,11 @@ all_components_details = [
         is_shared_component=True,
     ),
     ComponentDetails(
-        name="element-call-sfu-jwt",
-        value_file_prefix="element-call",
-        helm_key="elementCall",
+        name="matrix-rtc-sfu-jwt",
+        value_file_prefix="matrix-rtc",
+        helm_key="matrixRTC",
         sub_components=[
-            SubComponentDetails(name="element-call-sfu", helm_key="sfu", has_ingress=False, uses_shared_ingress=True)
+            SubComponentDetails(name="matrix-rtc-sfu", helm_key="sfu", has_ingress=False, uses_shared_ingress=True)
         ],
         shared_component_names=["init-secrets"],
     ),

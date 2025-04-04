@@ -5,8 +5,6 @@
 # source_fragments: synapse-minimal.yaml synapse-pytest-base-extras.yaml synapse-pytest-self-extras.yaml init-secrets-minimal.yaml init-secrets-pytest-extras.yaml postgres-minimal.yaml
 # DO NOT EDIT DIRECTLY. Edit the fragment files to add / modify / remove values
 
-elementCall:
-  enabled: false
 elementWeb:
   enabled: false
 haproxy:
@@ -18,6 +16,8 @@ initSecrets:
   podSecurityContext:
     runAsGroup: 0
 matrixAuthenticationService:
+  enabled: false
+matrixRTC:
   enabled: false
 postgres:
   podSecurityContext:
