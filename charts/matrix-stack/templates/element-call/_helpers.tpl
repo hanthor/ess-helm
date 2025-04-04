@@ -44,7 +44,7 @@ app.kubernetes.io/version: {{ .image.tag }}
 {{- range $envEntry := .extraEnv -}}
 {{- $_ := set $resultEnv $envEntry.name $envEntry.value -}}
 {{- end -}}
-{{- $_ := set $resultEnv "LIVEKIT_KEY_FILE" (printf "/secrets/%s"
+{{- $_ := set $resultEnv "LIVEKIT_KEY_FROM_FILE" (printf "/secrets/%s"
       (include "element-io.ess-library.init-secret-path" (
         dict "root" $root "context" (
           dict "secretPath" "elementCall.livekitKey"
@@ -53,7 +53,7 @@ app.kubernetes.io/version: {{ .image.tag }}
               "defaultSecretKey" "LIVEKIT_KEY"
           )
       ))) }}
-{{- $_ := set $resultEnv "LIVEKIT_SECRET_FILE" (printf "/secrets/%s"
+{{- $_ := set $resultEnv "LIVEKIT_SECRET_FROM_FILE" (printf "/secrets/%s"
       (include "element-io.ess-library.init-secret-path" (
         dict "root" $root "context" (
           dict "secretPath" "elementCall.livekitSecret"
